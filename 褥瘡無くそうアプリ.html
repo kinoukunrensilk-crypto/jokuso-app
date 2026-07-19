@@ -278,6 +278,182 @@
       .header{padding:10px 16px} .main{padding:16px} .tab-nav{padding:0 12px}
       .selector-row{grid-template-columns:1fr} .panel{padding:16px}
     }
+
+    /* === HANDBOOK STYLES === */
+    .handbook-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .handbook-card {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 24px 24px 40px; /* 左側にリング用余白 */
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      transition: transform 0.2s, border-color 0.2s;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .handbook-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+    /* リング用のパンチ穴の表現（キャッチーで物理イメージを刺激） */
+    .handbook-ring-hole {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+    .handbook-ring-hole::after {
+      content: '';
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px dashed var(--text3);
+      position: absolute;
+    }
+    /* カード内コンテンツ */
+    .handbook-card-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+    .handbook-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .handbook-card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .handbook-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      color: #fff;
+    }
+    .handbook-body {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text2);
+      flex-grow: 1;
+    }
+    .handbook-body strong {
+      font-size: 17px;
+      color: var(--text);
+      background: linear-gradient(transparent 60%, rgba(234, 179, 8, 0.3) 60%);
+      font-weight: 700;
+    }
+    body.light .handbook-body strong {
+      background: linear-gradient(transparent 60%, rgba(234, 179, 8, 0.45) 60%);
+    }
+    .handbook-body ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 8px;
+    }
+    .handbook-body li {
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 20px;
+      font-size: 15px;
+    }
+    .handbook-body li::before {
+      content: '📌';
+      position: absolute;
+      left: 0;
+      top: 1px;
+      font-size: 13px;
+    }
+    .handbook-footer {
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--text3);
+      text-align: right;
+      border-top: 1px dashed var(--border);
+      padding-top: 6px;
+    }
+    
+    /* 印刷時の用紙レイアウト設定 */
+    @media print {
+      body.print-handbook-active {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      body.print-handbook-active .header,
+      body.print-handbook-active .tab-nav,
+      body.print-handbook-active .main > .tab-content:not(#tab-handbook),
+      body.print-handbook-active .handbook-print-exclude,
+      body.print-handbook-active .toast,
+      body.print-handbook-active .modal-overlay {
+        display: none !important;
+      }
+      body.print-handbook-active .main {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      body.print-handbook-active #tab-handbook {
+        display: block !important;
+      }
+      body.print-handbook-active .handbook-grid {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body.print-handbook-active .handbook-card {
+        border: 2px solid #000 !important;
+        color: #000 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        page-break-after: always;
+        break-after: page;
+        margin: 0 auto 30mm auto !important; /* カットしやすいよう余白を開ける */
+        width: 148mm !important; /* A5横 / ハガキサイズ程度 */
+        height: 100mm !important;
+        padding: 20px 20px 20px 36px !important;
+        box-sizing: border-box !important;
+        border-radius: 12px !important;
+      }
+      body.print-handbook-active .handbook-ring-hole {
+        background: #fff !important;
+        border: 2px solid #000 !important;
+      }
+      body.print-handbook-active .handbook-card-title,
+      body.print-handbook-active .handbook-body,
+      body.print-handbook-active .handbook-body strong {
+        color: #000 !important;
+      }
+      body.print-handbook-active .handbook-badge {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        background: #eee !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -302,6 +478,7 @@
     <button class="tab-btn" data-tab="ranking">🏆 リスクランキング</button>
     <button class="tab-btn" data-tab="designr">🩹 DESIGN-R記録</button>
     <button class="tab-btn" data-tab="karte">👤 個人カルテ</button>
+    <button class="tab-btn" data-tab="handbook">📖 ポジショニングハンドブック</button>
   </div>
 
   <!-- MAIN -->
@@ -541,6 +718,141 @@
       </div>
       <div id="karte-empty" class="panel" style="text-align:center;padding:60px;color:var(--text2)">
         ⬆️ 部屋番号を選択すると、個人カルテが表示されます。
+      </div>
+    </div>
+
+    <!-- ====== TAB 6: POSITIONING HANDBOOK ====== -->
+    <div class="tab-content" id="tab-handbook">
+      <div class="panel handbook-print-exclude" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <h2 style="font-size:18px;font-weight:700">📖 ポジショニングハンドブック（印刷・ラミネート用）</h2>
+          <p style="font-size:13px;color:var(--text2);margin-top:4px">
+            現場での使い勝手を考慮した、文字が大きくキャッチーなカード型マニュアルです。印刷してラミネートし、リングで綴じてご使用ください。
+          </p>
+        </div>
+        <button class="btn btn-primary" id="btn-print-handbook" style="display:inline-flex;align-items:center;gap:8px">
+          🖨️ ハンドブックを印刷する
+        </button>
+      </div>
+
+      <div class="handbook-grid">
+        <!-- CARD 1 -->
+        <div class="handbook-card" style="border-left: 6px solid var(--accent)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--accent)">共通ルール</span>
+              <h3 class="handbook-card-title">① ポジショニングの3大鉄則</h3>
+            </div>
+            <div class="handbook-body">
+              <ul>
+                <li><strong>「点」ではなく「面」で支える！</strong><br>クッションはすき間なく、広く平らにあてましょう。</li>
+                <li><strong>姿勢を変えたら「背抜き」をする！</strong><br>シーツや衣類が引っ張られると、それだけで褥瘡になります。</li>
+                <li><strong>関節は「自然な角度」にまげる！</strong><br>無理に伸ばすと体が緊張し、局所に強い圧がかかります。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ ポジショニング基本</div>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="handbook-card" style="border-left: 6px solid var(--green)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--green)">仰向け寝</span>
+              <h3 class="handbook-card-title">② 仰臥位のチェックポイント</h3>
+            </div>
+            <div class="handbook-body">
+              <ul>
+                <li><strong>「お尻（仙骨）」の圧をにがす！</strong><br>腰から太ももにかけてクッションを入れ、お尻の下にすき間を作ります。</li>
+                <li><strong>「かかと」は絶対に浮かせる！</strong><br>かかとは骨が飛び出しており、非常に赤くなりやすい場所です。ふくらはぎの下を支えて浮かせましょう。</li>
+                <li>頭・背中・太もも・ふくらはぎの下に隙間がないか確認！</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 仰臥位（背臥位）</div>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="handbook-card" style="border-left: 6px solid var(--purple)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--purple)">横向き寝</span>
+              <h3 class="handbook-card-title">③ 側臥位のチェックポイント</h3>
+            </div>
+            <div class="handbook-body">
+              <ul>
+                <li><strong>骨の出っ張り（大転子）をあてない！</strong><br>真横（90度）を向くと腰の骨に圧が集中します。</li>
+                <li><strong>体は「30度」だけ傾ける！</strong><br>背中に30度用のクッションをしっかり差し込み、体重を背中の広い面へ逃がします。</li>
+                <li><strong>ひざ・足首のぶつかりを防ぐ！</strong><br>両足の間にクッションを挟み、骨同士が当たらないようにします。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 30度側臥位</div>
+          </div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="handbook-card" style="border-left: 6px solid var(--yellow)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--yellow)">座る姿勢</span>
+              <h3 class="handbook-card-title">④ 座位・車椅子のポイント</h3>
+            </div>
+            <div class="handbook-body">
+              <ul>
+                <li><strong>ずり落ち「すべり座り」は絶対ダメ！</strong><br>体がすべると、お尻の皮膚が引っ張られて一発で褥瘡になります。</li>
+                <li><strong>お尻を一番奥まで引いて「90度」！</strong><br>骨盤をしっかり立てて、深く腰掛けてもらいます。</li>
+                <li><strong>足の裏はフットサポートにつける！</strong><br>足が浮いていると、お尻（坐骨）にかかる体重が増えてしまいます。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 座位姿勢</div>
+          </div>
+        </div>
+
+        <!-- CARD 5 -->
+        <div class="handbook-card" style="border-left: 6px solid var(--orange)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--orange)">必須スキル</span>
+              <h3 class="handbook-card-title">⑤ 「背抜き・圧抜き」のやり方</h3>
+            </div>
+            <div class="handbook-body">
+              <p style="margin-bottom:8px">クッションを入れた直後は、皮膚や衣服が引っ張られています。必ず以下の手技を行ってください！</p>
+              <ul>
+                <li><strong>背抜き</strong>：背中の下に両手を差し込み、シーツや衣服のつっぱりを逃がすように、さっと手を滑らせて抜きます。</li>
+                <li><strong>尻抜き</strong>：お尻の下にも同様に手を入れ、圧を逃がします。</li>
+                <li><strong>足抜き</strong>：かかと・ふくらはぎを一度持ち上げ、下ろします。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 背抜き・圧抜き</div>
+          </div>
+        </div>
+
+        <!-- CARD 6 -->
+        <div class="handbook-card" style="border-left: 6px solid var(--red)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--red)">皮膚の観察</span>
+              <h3 class="handbook-card-title">⑥ 赤み（発赤）の見分け方</h3>
+            </div>
+            <div class="handbook-body">
+              <ul>
+                <li><strong>赤いところを見つけたら「指で3秒押す」！</strong><br>骨が出ている場所（仙骨、かかとなど）はオムツ交換時に必ずチェック！</li>
+                <li><strong>【判定ルール】</strong><br>
+                  ・白く消える ➡ 大丈夫（一時的な赤みです）<br>
+                  ・<strong>赤いまま消えない ➡ 褥瘡の初期（ステージⅠ）！</strong>
+                </li>
+                <li><strong>赤いままなら、すぐに看護師へ報告！</strong><br>そして本アプリの「DESIGN-R記録」に登録しましょう。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 皮膚観察の基本</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1181,6 +1493,18 @@ function setupEventListeners(){
       localStorage.removeItem('jokuso_designr');
       showToast('実データ同期に戻します。画面をリロードします。');
       setTimeout(()=>location.reload(), 1500);
+    });
+  }
+
+  // Print handbook
+  const printHandbookBtn = document.getElementById('btn-print-handbook');
+  if(printHandbookBtn){
+    printHandbookBtn.addEventListener('click', ()=>{
+      document.body.classList.add('print-handbook-active');
+      window.print();
+      setTimeout(()=>{
+        document.body.classList.remove('print-handbook-active');
+      }, 1000);
     });
   }
 }
