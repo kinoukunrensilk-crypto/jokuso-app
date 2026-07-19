@@ -682,7 +682,46 @@
       </div>
     </div>
 
-    <!-- ====== TAB 5: PE    <!-- ====== TAB 6: POSITIONING HANDBOOK ====== -->
+    <!-- ====== TAB 5: PE    <!-- ====== TAB 5: PERSONAL KARTE ====== -->
+    <div class="tab-content" id="tab-karte">
+      <div class="panel">
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:20px">
+          <div class="field-group" style="width:180px;margin-bottom:0">
+            <select id="karte-room"><option value="">部屋番号を選択</option></select>
+          </div>
+          <div class="name-display" id="karte-name" style="font-size:22px">—</div>
+        </div>
+      </div>
+      <div id="karte-content" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="panel">
+            <div class="panel-title">📈 ブレーデンスケール推移</div>
+            <div id="karte-braden-summary" style="margin-bottom:12px"></div>
+            <div class="chart-container"><canvas id="karte-braden-chart"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🩺 現在の推奨ケア</div>
+            <div id="karte-care"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🩹 褥瘡発生履歴</div>
+          <div id="karte-ulcer-history"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📋 ブレーデン評価履歴一覧</div>
+          <div class="tbl-wrap"><table class="data-tbl" id="karte-braden-tbl">
+            <thead><tr><th>評価日</th><th>知覚</th><th>湿潤</th><th>活動性</th><th>可動性</th><th>栄養</th><th>摩擦</th><th>合計</th><th>リスク</th><th>スタッフ</th></tr></thead>
+            <tbody id="karte-braden-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div id="karte-empty" class="panel" style="text-align:center;padding:60px;color:var(--text2)">
+        ⬆️ 部屋番号を選択すると、個人カルテが表示されます。
+      </div>
+    </div>
+
+    <!-- ====== TAB 6: POSITIONING HANDBOOK ====== -->
     <div class="tab-content" id="tab-handbook">
       <div class="panel handbook-print-exclude" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div>
