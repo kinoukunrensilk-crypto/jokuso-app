@@ -697,164 +697,195 @@
       </div>
 
       <div class="handbook-grid">
-        <!-- CARD 1 -->
+        <!-- CARD 1: 首のポジショニング -->
         <div class="handbook-card" style="border-left: 6px solid var(--accent)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--accent)">共通ルール</span>
-              <h3 class="handbook-card-title">① ポジショニングの3大鉄則</h3>
+              <span class="handbook-badge" style="background:var(--accent)">① 首</span>
+              <h3 class="handbook-card-title">首のポジショニング（拘縮対策）</h3>
             </div>
             
-            <!-- SVG Illustration -->
-            <svg viewBox="0 0 200 65" width="100%" height="65" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <!-- NG: Point pressure -->
-              <text x="45" y="14" font-size="8.5" fill="var(--red)" text-anchor="middle" font-weight="bold">❌ NG: 点で支える (圧が集中)</text>
-              <rect x="20" y="42" width="50" height="8" fill="none" stroke="var(--text3)" stroke-width="1.5"/>
-              <path d="M 45 20 L 45 35" stroke="var(--red)" stroke-width="2" marker-end="url(#arrow)"/>
-              <circle cx="45" cy="42" r="3.5" fill="var(--red)"/>
+            <!-- SVG Illustration (NG vs OK) -->
+            <svg viewBox="0 0 280 105" width="100%" height="105" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
+              <!-- Left Side: NG -->
+              <g transform="translate(0, 0)">
+                <text x="65" y="15" font-size="9.5" fill="var(--red)" text-anchor="middle" font-weight="bold">😢 ダメポジショニング</text>
+                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
+                <!-- Thin pillow / Flat -->
+                <path d="M 85 90 C 85 85, 110 85, 110 90" fill="var(--red-g)" stroke="var(--red)" stroke-width="1"/>
+                <circle cx="80" cy="55" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/> <!-- Head -->
+                <path d="M 72 58 Q 50 62 40 85" fill="none" stroke="var(--text)" stroke-width="1.8"/> <!-- Body -->
+                <!-- Gap pointer -->
+                <path d="M 68 68 Q 63 68 62 60" fill="none" stroke="var(--red)" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <text x="65" y="77" font-size="7" fill="var(--red)" text-anchor="middle" font-weight="bold">首の後ろに隙間あり！</text>
+                <text x="65" y="85" font-size="6.5" fill="var(--red)" text-anchor="middle">後頭部に圧が過度にかかる</text>
+              </g>
               
-              <!-- OK: Area dispersion -->
-              <text x="145" y="14" font-size="8.5" fill="var(--green)" text-anchor="middle" font-weight="bold">⭕ OK: 面で支える (広く分散)</text>
-              <path d="M 115 40 Q 145 35 175 40" fill="none" stroke="var(--green)" stroke-width="2"/>
-              <path d="M 125 44 L 125 49 M 145 44 L 145 49 M 165 44 L 165 49" stroke="var(--green)" stroke-width="1.5"/>
-              <rect x="110" y="44" width="70" height="8" fill="var(--green-g)" stroke="var(--green)" stroke-dasharray="2,2"/>
+              <!-- Right Side: OK -->
+              <g transform="translate(145, 0)">
+                <text x="65" y="15" font-size="9.5" fill="var(--green)" text-anchor="middle" font-weight="bold">✨ 神ポジショニング</text>
+                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
+                <!-- Pillow supporting neck fully -->
+                <path d="M 60 90 Q 80 50 110 70 L 110 90 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1"/>
+                <circle cx="75" cy="55" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/>
+                <path d="M 67 58 Q 48 62 38 85" fill="none" stroke="var(--text)" stroke-width="1.8"/>
+                <text x="65" y="80" font-size="7.5" fill="var(--green)" text-anchor="middle" font-weight="bold">枕で首の後ろを密着！</text>
+              </g>
             </svg>
 
             <div class="handbook-body">
               <ul>
-                <li><strong>「点」ではなく「面」で支える！</strong><br>クッションはすき間なく、広く平らにあてましょう。</li>
-                <li><strong>姿勢を変えたら「背抜き」をする！</strong><br>シーツや衣類が引っ張られると、それだけで褥瘡になります。</li>
-                <li><strong>関節は「自然な角度」にまげる！</strong><br>無理に伸ばすと体が緊張し、局所に強い圧がかかります。</li>
+                <li><strong>後頭部への圧集中をふせぐ！</strong><br>首の後ろに支えがないと、後頭部に圧が過度にかかり筋肉が緊張します。</li>
+                <li><strong>枕をしっかり入れて隙間をなくす！</strong><br>首の下に隙間がないように枕をしっかり入れ込みましょう。</li>
+                <li>これだけで筋肉の余計な緊張がぬけ、<strong>拘縮が進むのを防げます！</strong></li>
               </ul>
             </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ ポジショニング基本</div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 部位別ポジショニング</div>
           </div>
         </div>
 
-        <!-- CARD 2 -->
-        <div class="handbook-card" style="border-left: 6px solid var(--green)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--green)">仰向け寝</span>
-              <h3 class="handbook-card-title">② 仰臥位のチェックポイント</h3>
-            </div>
-
-            <!-- SVG Illustration -->
-            <svg viewBox="0 0 220 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <line x1="10" y1="60" x2="210" y2="60" stroke="var(--text3)" stroke-width="1.5" />
-              <!-- Cushion supports -->
-              <path d="M 25 50 Q 35 42 45 50 Z" fill="var(--accent-g)" stroke="var(--accent)" stroke-width="1.2"/>
-              <path d="M 65 52 Q 80 44 95 52 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
-              <path d="M 115 52 Q 130 44 145 52 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
-              <path d="M 160 54 Q 175 48 190 54 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
-              <!-- Patient line -->
-              <circle cx="35" cy="35" r="6" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-              <path d="M 41 39 Q 55 39 65 47 Q 90 47 100 44 Q 125 44 135 48 Q 160 48 175 48 L 195 54" fill="none" stroke="var(--text)" stroke-width="1.8" stroke-linecap="round"/>
-              <!-- Guidelines -->
-              <text x="80" y="24" font-size="8" fill="var(--accent)" text-anchor="middle" font-weight="bold">仙骨部：なだらかに支えて除圧</text>
-              <text x="182" y="24" font-size="8" fill="var(--green)" text-anchor="middle" font-weight="bold">かかと：完全に浮かす</text>
-              <path d="M 80 27 L 80 43" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2,2"/>
-              <path d="M 182 27 L 182 46" stroke="var(--green)" stroke-width="1" stroke-dasharray="2,2"/>
-            </svg>
-
-            <div class="handbook-body">
-              <ul>
-                <li><strong>「お尻（仙骨）」の圧を全体に逃がす！</strong><br>腰から太ももにかけて<b>なだらかに</b>クッションをあて、お尻の下が「突っ張らず、手のひらがすっと入る」状態にします（無理に隙間を作ろうと浮かせると、クッションの端が当たりかえって褥瘡になります！）。</li>
-                <li><strong>「かかと」は絶対に浮かせる！</strong><br>かかとは骨が飛び出しており、非常に赤くなりやすい場所です。ふくらはぎの下を支えて浮かせましょう。</li>
-                <li>頭・背中・太もも・ふくらはぎの下に隙間がないか確認！</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 仰臥位（背臥位）</div>
-          </div>
-        </div>
-
-        <!-- CARD 3 -->
+        <!-- CARD 2: 肩のポジショニング -->
         <div class="handbook-card" style="border-left: 6px solid var(--purple)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--purple)">横向き寝</span>
-              <h3 class="handbook-card-title">③ 側臥位のチェックポイント</h3>
+              <span class="handbook-badge" style="background:var(--purple)">② 肩</span>
+              <h3 class="handbook-card-title">肩のポジショニング（上肢サポート）</h3>
             </div>
 
-            <!-- SVG Illustration -->
-            <svg viewBox="0 0 200 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <line x1="10" y1="60" x2="190" y2="60" stroke="var(--text3)" stroke-width="1.5" />
-              <!-- 30 degree wedge -->
-              <path d="M 50 60 L 95 60 L 95 34 Z" fill="var(--purple-g)" stroke="var(--purple)" stroke-width="1.2"/>
-              <!-- Body silhouette 30 deg rotated -->
-              <ellipse cx="110" cy="38" rx="20" ry="14" fill="none" stroke="var(--text)" stroke-width="1.8" transform="rotate(-30, 110, 38)"/>
-              <text x="110" y="41" font-size="8" fill="var(--text)" text-anchor="middle" font-weight="bold">体幹</text>
-              <path d="M 95 60 A 30 30 0 0 0 120 38" fill="none" stroke="var(--purple)" stroke-width="1.5"/>
-              <text x="112" y="55" font-size="9" fill="var(--purple)" font-weight="bold">30°</text>
-              <!-- Info -->
-              <text x="156" y="24" font-size="8" fill="var(--purple)" text-anchor="middle" font-weight="bold">骨の出っ張り（大転子）</text>
-              <text x="156" y="36" font-size="8" fill="var(--purple)" text-anchor="middle" font-weight="bold">への圧迫を避ける！</text>
+            <!-- SVG Illustration (NG vs OK) -->
+            <svg viewBox="0 0 280 105" width="100%" height="105" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
+              <!-- Left Side: NG -->
+              <g transform="translate(0, 0)">
+                <text x="65" y="15" font-size="9.5" fill="var(--red)" text-anchor="middle" font-weight="bold">😢 ダメポジショニング</text>
+                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
+                <circle cx="80" cy="50" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/>
+                <path d="M 72 53 Q 60 60 55 75 L 40 85" fill="none" stroke="var(--text)" stroke-width="1.8"/>
+                <!-- Arm floating -->
+                <path d="M 68 62 Q 80 65 78 80" fill="none" stroke="var(--text)" stroke-width="1.5"/>
+                <circle cx="78" cy="82" r="3.5" fill="none" stroke="var(--text)" stroke-width="1.5"/>
+                <circle cx="60" cy="67" r="5.5" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="2,2"/>
+                <text x="65" y="80" font-size="7" fill="var(--red)" text-anchor="middle" font-weight="bold">肩の後ろに隙間あり！</text>
+                <text x="65" y="87" font-size="6.5" fill="var(--red)" text-anchor="middle">肩甲骨に圧がかかりやすい</text>
+              </g>
+              
+              <!-- Right Side: OK -->
+              <g transform="translate(145, 0)">
+                <text x="65" y="15" font-size="9.5" fill="var(--green)" text-anchor="middle" font-weight="bold">✨ 神ポジショニング</text>
+                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
+                <!-- Cushions under shoulder & arm -->
+                <path d="M 40 85 Q 52 72 65 90 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1"/>
+                <path d="M 70 82 Q 85 73 98 88 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1"/>
+                <circle cx="75" cy="50" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/>
+                <path d="M 67 53 Q 55 60 50 75 L 35 85" fill="none" stroke="var(--text)" stroke-width="1.8"/>
+                <path d="M 63 62 Q 78 72 75 82" fill="none" stroke="var(--text)" stroke-width="1.5"/>
+                <circle cx="75" cy="84" r="3.5" fill="none" stroke="var(--text)" stroke-width="1.5"/>
+                <rect x="73" y="82" width="4" height="4" fill="var(--green)" rx="1"/> <!-- towel -->
+                <text x="65" y="97" font-size="7.5" fill="var(--green)" text-anchor="middle">クッションで肩〜腕を支える</text>
+              </g>
             </svg>
 
             <div class="handbook-body">
               <ul>
-                <li><strong>骨の出っ張り（大転子）をあてない！</strong><br>真横（90度）を向くと腰の骨に圧が集中します。</li>
-                <li><strong>体は「30度」だけ傾ける！</strong><br>背中に30度用のクッションをしっかり差し込み、体重を背中の広い面へ逃がします。</li>
-                <li><strong>ひざ・足首のぶつかりを防ぐ！</strong><br>両足の間にクッションを挟み、骨同士が当たらないようにします。</li>
+                <li><strong>肩の後ろの隙間をなくして安定！</strong><br>肩の後ろにすき間があると体が不安定になり、肩甲骨の突出部分に圧が集中します。</li>
+                <li><strong>肩甲骨・上腕・前腕の下に当てる！</strong><br>隙間を埋めるように段階的にクッションを差し込みます。最初に腕と肩を横に広げておくと入れやすいです。</li>
+                <li><strong>手指にはタオルを握らせる！</strong><br>指が握り込んで固まらないよう、開いてタオル等を入れましょう。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 部位別ポジショニング</div>
+          </div>
+        </div>
+
+        <!-- CARD 3: 下肢のポジショニング -->
+        <div class="handbook-card" style="border-left: 6px solid var(--green)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--green)">③ 足</span>
+              <h3 class="handbook-card-title">下肢全体のポジショニング（体圧分散）</h3>
+            </div>
+
+            <!-- SVG Illustration (Smooth whole leg support) -->
+            <svg viewBox="0 0 240 100" width="100%" height="100" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
+              <line x1="10" y1="85" x2="230" y2="85" stroke="var(--text3)" stroke-width="1.5" />
+              <!-- Under leg cushions -->
+              <path d="M 50 85 Q 80 50 110 85 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
+              <path d="M 105 85 Q 140 60 170 85 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
+              <path d="M 165 85 Q 185 75 200 85 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
+              <!-- Leg line -->
+              <path d="M 20 50 L 50 50 Q 80 43 100 52 Q 130 52 160 68 Q 185 68 205 78 L 220 78 L 225 65" fill="none" stroke="var(--text)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Heel marker -->
+              <circle cx="205" cy="78" r="2.5" fill="var(--green)"/>
+              <text x="205" y="60" font-size="8" fill="var(--green)" text-anchor="middle" font-weight="bold">かかとを浮かす</text>
+              <text x="115" y="25" font-size="9.5" fill="var(--green)" text-anchor="middle" font-weight="bold">⭕ 隙間なく下肢全体を支える</text>
+              <path d="M 115 30 L 115 50" stroke="var(--green)" stroke-width="1" stroke-dasharray="2,2"/>
+            </svg>
+
+            <div class="handbook-body">
+              <ul>
+                <li><strong>隙間なく「下肢全体」を支える！</strong><br>太もも、ひざの裏、ふくらはぎの下に沿うように隙間なくクッションを当てて、広い面積で体重を受け止めます。</li>
+                <li><strong>「お尻（仙骨）」の圧を全体に逃がす！</strong><br>なだらかに下肢全体を支えることで、お尻（仙骨）にかかる負担が大幅に減少します。</li>
+                <li><strong>「かかと」は完全に浮かす！</strong><br>かかとがベッド面に直接接触しないよう、足首付近までしっかり支えて浮かせましょう。</li>
+              </ul>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 下肢ポジショニング</div>
+          </div>
+        </div>
+
+        <!-- CARD 4: 側臥位（横向き寝） -->
+        <div class="handbook-card" style="border-left: 6px solid var(--purple)">
+          <div class="handbook-ring-hole"></div>
+          <div class="handbook-card-content">
+            <div class="handbook-card-header">
+              <span class="handbook-badge" style="background:var(--purple)">④ 横向き</span>
+              <h3 class="handbook-card-title">30度側臥位（横向き寝）</h3>
+            </div>
+
+            <!-- SVG Illustration (Realistic 30 deg wedge and knee pillow) -->
+            <svg viewBox="0 0 240 105" width="100%" height="105" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
+              <line x1="10" y1="90" x2="230" y2="90" stroke="var(--text3)" stroke-width="1.5" />
+              <!-- Back wedge cushion (Blue) -->
+              <path d="M 40 90 L 85 90 L 85 55 Z" fill="var(--accent-g)" stroke="var(--accent)" stroke-width="1.5"/>
+              <!-- Leg pillow -->
+              <ellipse cx="145" cy="70" rx="25" ry="10" fill="var(--green-g)" stroke="var(--green)" stroke-width="1" transform="rotate(-15, 145, 70)"/>
+              <!-- Body lines -->
+              <circle cx="75" cy="40" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/> <!-- Head -->
+              <path d="M 75 48 C 90 48, 105 55, 115 70" fill="none" stroke="var(--text)" stroke-width="2"/> <!-- Back & Hip -->
+              <path d="M 115 70 Q 135 60 160 72 L 195 82" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/> <!-- Top leg -->
+              <path d="M 115 70 Q 130 80 155 88 L 190 90" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="round"/> <!-- Bottom leg -->
+              <!-- 30 degree marker -->
+              <path d="M 85 90 A 25 25 0 0 0 105 70" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+              <text x="100" y="85" font-size="9" fill="var(--accent)" font-weight="bold">30°</text>
+              <text x="170" y="25" font-size="8.5" fill="var(--green)" text-anchor="middle" font-weight="bold">足の間にクッションを挟む</text>
+              <text x="170" y="37" font-size="7.5" fill="var(--text2)" text-anchor="middle">（骨同士の接触・摩擦を防ぐ）</text>
+            </svg>
+
+            <div class="handbook-body">
+              <ul>
+                <li><strong>大転子（骨の出っ張り）を直接あてない！</strong><br>真横（90度）を向いて寝ると、腰の骨に体重がすべてかかり、短時間で褥瘡が発生します。</li>
+                <li><strong>背中に30度クッションを入れる！</strong><br>背中に三角クッションなどを当て、体を軽く（30度）傾けます。これで背中の広い面で体重を支えられます。</li>
+                <li><strong>ひざ・足首の間にクッションを挟む！</strong><br>両足が重なり合って骨同士が擦れ合うのを防ぐため、足の間にクッションを挿入します。</li>
               </ul>
             </div>
             <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 30度側臥位</div>
           </div>
         </div>
 
-        <!-- CARD 4 -->
-        <div class="handbook-card" style="border-left: 6px solid var(--yellow)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--yellow)">座る姿勢</span>
-              <h3 class="handbook-card-title">④ 座位・車椅子のポイント</h3>
-            </div>
-
-            <!-- SVG Illustration -->
-            <svg viewBox="0 0 200 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <line x1="70" y1="10" x2="70" y2="52" stroke="var(--text3)" stroke-width="2"/>
-              <line x1="68" y1="52" x2="125" y2="52" stroke="var(--text3)" stroke-width="2"/>
-              <line x1="125" y1="52" x2="125" y2="60" stroke="var(--text3)" stroke-width="1.2"/>
-              <line x1="120" y1="60" x2="135" y2="60" stroke="var(--text3)" stroke-width="2"/>
-              <!-- Deep sitting posture -->
-              <circle cx="85" cy="18" r="5" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-              <path d="M 85 23 L 80 49 L 120 49 L 120 59" fill="none" stroke="var(--text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M 96 35 Q 78 42 73 49" fill="none" stroke="var(--yellow)" stroke-width="2" marker-end="url(#arrow)"/>
-              <text x="156" y="24" font-size="8" fill="var(--yellow)" text-anchor="middle" font-weight="bold">お尻を一番奥へ！</text>
-              <text x="156" y="36" font-size="8" fill="var(--yellow)" text-anchor="middle" font-weight="bold">骨盤を立てて90度</text>
-              <circle cx="120" cy="60" r="2.5" fill="var(--green)"/>
-              <text x="156" y="52" font-size="7.5" fill="var(--green)" text-anchor="middle">足の裏をしっかり接地</text>
-            </svg>
-
-            <div class="handbook-body">
-              <ul>
-                <li><strong>ずり落ち「すべり座り」は絶対ダメ！</strong><br>体がすべると、お尻の皮膚が引っ張られて一発で褥瘡になります。</li>
-                <li><strong>お尻を一番奥まで引いて「90度」！</strong><br>骨盤をしっかり立てて、深く腰掛けてもらいます。</li>
-                <li><strong>足の裏はフットサポートにつける！</strong><br>足が浮いていると、お尻（坐骨）にかかる体重が増えてしまいます。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 座位姿勢</div>
-          </div>
-        </div>
-
-        <!-- CARD 5 -->
+        <!-- CARD 5: 背抜き・圧抜き -->
         <div class="handbook-card" style="border-left: 6px solid var(--orange)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--orange)">必須スキル</span>
-              <h3 class="handbook-card-title">⑤ 「背抜き・圧抜き」のやり方</h3>
+              <span class="handbook-badge" style="background:var(--orange)">⑤ 圧抜き</span>
+              <h3 class="handbook-card-title">「背抜き・圧抜き」のやり方</h3>
             </div>
 
             <!-- SVG Illustration -->
             <svg viewBox="0 0 200 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
               <path d="M 20 25 C 60 25, 80 35, 130 35 L 180 35" fill="none" stroke="var(--text)" stroke-width="1.8"/>
               <path d="M 60 45 Q 90 33 120 45 Z" fill="var(--orange-g)" stroke="var(--orange)" stroke-width="1.2"/>
-              <!-- Hand sliding under icon -->
+              <!-- Hand sliding -->
               <path d="M 120 20 L 96 35 M 96 35 L 105 32 M 96 35 L 99 26" fill="none" stroke="var(--orange)" stroke-width="1.8"/>
               <text x="80" y="16" font-size="8.5" fill="var(--orange)" text-anchor="middle" font-weight="bold">手をスッとすべり込ませる</text>
               <text x="156" y="52" font-size="8" fill="var(--text3)" text-anchor="middle">衣服・皮膚の「つっぱり」を逃がす</text>
@@ -872,102 +903,28 @@
           </div>
         </div>
 
-        <!-- CARD 6 -->
+        <!-- CARD 6: 皮膚の観察 -->
         <div class="handbook-card" style="border-left: 6px solid var(--red)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--red)">皮膚の観察</span>
-              <h3 class="handbook-card-title">⑥ 赤み（発赤）の見分け方</h3>
+              <span class="handbook-badge" style="background:var(--red)">⑥ 観察</span>
+              <h3 class="handbook-card-title">赤み（発赤）の見分け方</h3>
             </div>
 
             <!-- SVG Illustration -->
             <svg viewBox="0 0 200 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <!-- Before pressing -->
               <rect x="15" y="42" width="55" height="6" fill="var(--red-g)" stroke="var(--red)" stroke-width="0.8"/>
               <circle cx="42" cy="38" r="7" fill="var(--red)" opacity="0.3"/>
               <text x="42" y="18" font-size="8" fill="var(--text2)" text-anchor="middle">赤みを発見</text>
-              
-              <!-- Action: Pressing -->
               <path d="M 105 14 L 105 34 Q 105 38 109 38 L 115 38 L 115 14" fill="none" stroke="var(--text)" stroke-width="1.5"/>
               <path d="M 110 38 L 110 44" stroke="var(--red)" stroke-width="1.8"/>
               <text x="110" y="10" font-size="8.5" fill="var(--red)" text-anchor="middle" font-weight="bold">3秒間押す！</text>
-
-              <!-- Result -->
               <text x="162" y="24" font-size="8" fill="var(--red)" text-anchor="middle" font-weight="bold">指を離して赤いままなら</text>
               <text x="162" y="36" font-size="9.5" fill="var(--red)" text-anchor="middle" font-weight="bold">🚨 初期褥瘡の疑い</text>
               <text x="162" y="48" font-size="7.5" fill="var(--text3)" text-anchor="middle">すぐ看護師に報告！</text>
             </svg>
 
-            <div class="handbook-body">
-              <ul>
-                <li><strong>赤いところを見つけたら「指で3秒押す」！</strong><br>骨が出ている場所（仙骨、かかとなど）はオムツ交換時に必ずチェック！</li>
-                <li><strong>【判定ルール】</strong><br>
-                  ・白く消える ➡ 大張夫（一時的な赤みです）<br>
-                  ・<strong>赤いまま消えない ➡ 褥瘡の初期（ステージⅠ）！</strong>
-                </li>
-                <li><strong>赤いままなら、すぐに看護師へ報告！</strong><br>そして本アプリの「DESIGN-R記録」に登録しましょう。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 皮膚観察の基本</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>�</strong><br>両足の間にクッションを挟み、骨同士が当たらないようにします。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 30度側臥位</div>
-          </div>
-        </div>
-
-        <!-- CARD 4 -->
-        <div class="handbook-card" style="border-left: 6px solid var(--yellow)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--yellow)">座る姿勢</span>
-              <h3 class="handbook-card-title">④ 座位・車椅子のポイント</h3>
-            </div>
-            <div class="handbook-body">
-              <ul>
-                <li><strong>ずり落ち「すべり座り」は絶対ダメ！</strong><br>体がすべると、お尻の皮膚が引っ張られて一発で褥瘡になります。</li>
-                <li><strong>お尻を一番奥まで引いて「90度」！</strong><br>骨盤をしっかり立てて、深く腰掛けてもらいます。</li>
-                <li><strong>足の裏はフットサポートにつける！</strong><br>足が浮いていると、お尻（坐骨）にかかる体重が増えてしまいます。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 座位姿勢</div>
-          </div>
-        </div>
-
-        <!-- CARD 5 -->
-        <div class="handbook-card" style="border-left: 6px solid var(--orange)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--orange)">必須スキル</span>
-              <h3 class="handbook-card-title">⑤ 「背抜き・圧抜き」のやり方</h3>
-            </div>
-            <div class="handbook-body">
-              <p style="margin-bottom:8px">クッションを入れた直後は、皮膚や衣服が引っ張られています。必ず以下の手技を行ってください！</p>
-              <ul>
-                <li><strong>背抜き</strong>：背中の下に両手を差し込み、シーツや衣服のつっぱりを逃がすように、さっと手を滑らせて抜きます。</li>
-                <li><strong>尻抜き</strong>：お尻の下にも同様に手を入れ、圧を逃がします。</li>
-                <li><strong>足抜き</strong>：かかと・ふくらはぎを一度持ち上げ、下ろします。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 背抜き・圧抜き</div>
-          </div>
-        </div>
-
-        <!-- CARD 6 -->
-        <div class="handbook-card" style="border-left: 6px solid var(--red)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--red)">皮膚の観察</span>
-              <h3 class="handbook-card-title">⑥ 赤み（発赤）の見分け方</h3>
-            </div>
             <div class="handbook-body">
               <ul>
                 <li><strong>赤いところを見つけたら「指で3秒押す」！</strong><br>骨が出ている場所（仙骨、かかとなど）はオムツ交換時に必ずチェック！</li>
@@ -982,10 +939,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- ====== SETTINGS MODAL ====== -->
+    </div><!-- ====== SETTINGS MODAL ====== -->
   <div class="modal-overlay" id="modal-settings">
     <div class="modal-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px">
