@@ -815,8 +815,13 @@ async function gasGet(action){
   const url = getGasUrl();
   if(!url) return null;
   try{
-    const r = await fetch(`${url}?action=${action}`, {mode:'cors'});
-    return await r.json();
+    const r = await fetch(`${url}?action=${action}`, {
+      mode: 'cors',
+      credentials: 'omit',
+      redirect: 'follow'
+    });
+    const text = await r.text();
+    return JSON.parse(text);
   }catch(e){console.error('GAS GET error:',e); return null}
 }
 
