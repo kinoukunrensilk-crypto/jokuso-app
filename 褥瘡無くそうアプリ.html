@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>褥瘡無くそうアプリ</title>
+  <meta name="description" content="ブレーデンスケールとDESIGN-Rを統合した褥瘡予防・管理総合アプリケーション">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19; --bg2: #111827; --panel: rgba(17,24,39,0.8); --panel-solid: #111827;
+      --border: rgba(255,255,255,0.08); --text: #f3f4f6; --text2: #9ca3af; --text3: #6b7280;
+      --input-bg: rgba(255,255,255,0.05); --hover: rgba(255,255,255,0.03);
+      --accent: #3b82f6; --accent-g: rgba(59,130,246,0.15);
+      --red: #ef4444; --orange: #f59e0b; --yellow: #eab308; --green: #10b981; --purple: #8b5cf6;
+      --red-g: rgba(239,68,68,0.15); --orange-g: rgba(245,158,11,0.15);
+      --yellow-g: rgba(234,179,8,0.15); --green-g: rgba(16,185,129,0.15);
+      --c2: #3b82f6; --c3: #10b981; --c4: #f59e0b; --c5: #8b5cf6;
+      --radius: 16px; --radius-sm: 10px;
+    }
+    body.light { --bg: #f0f2f5; --bg2: #e5e7eb; --panel: rgba(255,255,255,0.88); --panel-solid: #fff;
+      --border: rgba(0,0,0,0.08); --text: #1f2937; --text2: #4b5563; --text3: #9ca3af;
+      --input-bg: rgba(0,0,0,0.03); --hover: rgba(0,0,0,0.02);
+      --accent-g: rgba(59,130,246,0.08); --red-g: rgba(239,68,68,0.08);
+      --orange-g: rgba(245,158,11,0.08); --yellow-g: rgba(234,179,8,0.08); --green-g: rgba(16,185,129,0.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Outfit','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);
+      min-height:100vh;transition:background .4s,color .4s;
+      background-image:radial-gradient(at 0% 0%,var(--panel) 0,transparent 50%),radial-gradient(at 50% 0%,var(--accent-g) 0,transparent 50%);
+      background-attachment:fixed}
+
+    /* === HEADER === */
+    .header{padding:14px 28px;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);
+      background:rgba(11,15,25,0.03);display:flex;justify-content:space-between;align-items:center;
+      position:sticky;top:0;z-index:100}
+    .header h1{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px;
+      background:linear-gradient(135deg,var(--text) 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .header-r{display:flex;align-items:center;gap:10px}
+    .hdr-btn{padding:7px 14px;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid var(--border);
+      background:var(--input-bg);color:var(--text);font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:6px}
+    .hdr-btn:hover{background:rgba(128,128,128,.12)}
+    .date-disp{font-size:12px;color:var(--text2)}
+
+    /* === TAB NAV === */
+    .tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 28px;background:var(--panel);
+      backdrop-filter:blur(12px);overflow-x:auto;position:sticky;top:55px;z-index:99}
+    .tab-btn{padding:14px 20px;font-size:13.5px;font-weight:600;color:var(--text2);border:none;background:none;
+      cursor:pointer;position:relative;white-space:nowrap;font-family:inherit;transition:color .2s;display:flex;align-items:center;gap:6px}
+    .tab-btn:hover{color:var(--text)}
+    .tab-btn.active{color:var(--accent)}
+    .tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+      background:var(--accent);border-radius:3px 3px 0 0}
+    .tab-badge{background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700}
+
+    /* === MAIN CONTAINER === */
+    .main{max-width:1440px;margin:0 auto;padding:24px 28px}
+    .tab-content{display:none} .tab-content.active{display:block}
+
+    /* === PANELS & CARDS === */
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+      backdrop-filter:blur(20px);margin-bottom:20px;transition:background .4s,border .4s}
+    .panel-title{font-size:16px;font-weight:700;margin-bottom:16px;padding-left:10px;border-left:4px solid var(--accent);
+      display:flex;align-items:center;gap:8px}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+    .stat-card{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center;transition:transform .2s}
+    .stat-card:hover{transform:translateY(-2px)}
+    .stat-num{font-size:36px;font-weight:800;line-height:1}
+    .stat-label{font-size:12px;color:var(--text2);margin-top:6px;font-weight:500}
+    .stat-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}
+
+    /* === TWO-COL LAYOUT === */
+    .two-col{display:grid;grid-template-columns:1fr 380px;gap:24px}
+    @media(max-width:1050px){.two-col{grid-template-columns:1fr}}
+
+    /* === FORM ELEMENTS === */
+    .field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    .field-label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase}
+    select,input[type="text"],input[type="number"],input[type="date"],textarea{
+      background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);
+      padding:10px 14px;font-size:14px;font-family:inherit;outline:none;transition:all .3s;width:100%}
+    select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-g)}
+    select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 10px center;background-size:14px;padding-right:32px}
+    textarea{resize:vertical;min-height:80px}
+
+    /* === SELECTOR ROW === */
+    .selector-row{display:grid;grid-template-columns:160px 180px 1fr;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px dashed var(--border)}
+    .selector-row.four-cols{grid-template-columns:130px 140px 150px 1fr}
+    @media(max-width:700px){.selector-row{grid-template-columns:1fr; .selector-row.four-cols{grid-template-columns:1fr}}}
+    .name-display{font-size:18px;font-weight:700;display:flex;align-items:center;height:42px}
+
+    /* === BRADEN ROWS === */
+    .braden-row{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:start;padding:14px 0;border-bottom:1px solid var(--border)}
+    .braden-label{font-size:14px;font-weight:600;padding-top:8px}
+    .score-btns{display:flex;flex-wrap:wrap;gap:6px}
+    .score-btn{position:relative}
+    .score-btn input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer}
+    .score-btn label{display:inline-block;padding:8px 14px;font-size:13px;font-weight:500;border-radius:8px;
+      background:var(--input-bg);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+    .score-btn input:checked+label{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 12px var(--accent-g)}
+    .score-btn:hover label{background:rgba(128,128,128,.12);color:var(--text)}
+    .braden-prev{font-size:11px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:4px}
+    .braden-prev .arrow-down{color:var(--red)} .braden-prev .arrow-up{color:var(--green)} .braden-prev .arrow-same{color:var(--text3)}
+
+    /* === SCORE DISPLAY === */
+    .score-display{background:var(--panel);border:1px solid var(--accent);border-radius:var(--radius);padding:20px;
+      text-align:center;margin:20px 0;box-shadow:0 0 20px var(--accent-g)}
+    .score-total{font-size:48px;font-weight:800}
+    .risk-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:14px;font-weight:700;margin-top:8px}
+
+    /* === HELP PANEL === */
+    .help-panel{background:var(--panel);border:1px solid var(--accent);border-radius:var(--radius);
+      padding:20px;backdrop-filter:blur(20px);box-shadow:0 0 20px var(--accent-g);min-height:200px;display:flex;flex-direction:column}
+    .sticky-col{position:sticky;top:90px;max-height:calc(100vh - 120px);overflow-y:auto;
+      display:flex;flex-direction:column;gap:16px;padding-right:4px}
+    .sticky-col::-webkit-scrollbar{width:6px}
+    .sticky-col::-webkit-scrollbar-thumb{background:rgba(128,128,128,.3);border-radius:3px}
+    .help-header{font-size:16px;font-weight:700;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+    .help-body{flex-grow:1;font-size:13.5px;line-height:1.6;color:var(--text2);overflow-y:auto}
+    .help-item{margin-bottom:10px;padding:10px;background:var(--input-bg);border-radius:8px;border-left:3px solid var(--border)}
+    .help-item.hl{border-left-color:var(--accent);background:rgba(59,130,246,.06)}
+    .help-item-t{font-weight:600;color:var(--text);font-size:13px;margin-bottom:3px}
+
+    /* === CARE RECOMMENDATIONS === */
+    .care-recs{margin-top:16px}
+    .care-card{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;
+      border-left:4px solid var(--orange)}
+    .care-card-title{font-weight:700;font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+    .care-card-body{font-size:12.5px;color:var(--text2);line-height:1.5}
+
+    /* === TABLE === */
+    .tbl-wrap{overflow-x:auto}
+    table.data-tbl{width:100%;border-collapse:collapse;font-size:13px}
+    table.data-tbl th{background:var(--input-bg);padding:10px 12px;text-align:left;font-weight:600;color:var(--text2);
+      border-bottom:2px solid var(--border);white-space:nowrap;position:sticky;top:0}
+    table.data-tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+    table.data-tbl tr:hover td{background:var(--hover)}
+
+    /* === RANKING === */
+    .rank-row{display:grid;grid-template-columns:40px 80px 1fr 80px 150px 80px;gap:12px;align-items:center;
+      padding:12px 16px;border-bottom:1px solid var(--border);transition:background .2s;border-radius:8px;cursor:pointer}
+    .rank-row:hover{background:var(--hover)}
+    .rank-num{font-size:18px;font-weight:800;color:var(--text3)}
+    .rank-row.risk-critical .rank-num{color:var(--red)}
+    .rank-row.risk-high .rank-num{color:var(--orange)}
+    @media(max-width:700px){.rank-row{grid-template-columns:30px 60px 1fr 50px 120px}}
+
+    /* === BODY MAP === */
+    .body-map-wrap{display:flex;justify-content:center;padding:20px}
+    .body-map{position:relative;width:200px;height:400px}
+    .body-map svg{width:100%;height:100%}
+    .body-dot{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--red);border:2px solid #fff;
+      cursor:pointer;animation:pulse-dot 2s infinite;z-index:2}
+    @keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+
+    /* === CHART (Canvas) === */
+    .chart-container{position:relative;width:100%;height:250px;margin:16px 0}
+    .chart-container canvas{width:100%!important;height:100%!important}
+
+    /* === BTN === */
+    .btn{padding:12px 24px;font-size:14px;font-weight:600;border-radius:var(--radius-sm);cursor:pointer;border:none;
+      transition:all .3s;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 16px var(--accent-g)}
+    .btn-primary:hover{transform:translateY(-2px);filter:brightness(1.1)}
+    .btn-sec{background:var(--input-bg);color:var(--text);border:1px solid var(--border)}
+    .btn-sec:hover{background:rgba(128,128,128,.1)}
+    .btn-danger{background:var(--red);color:#fff}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:6px}
+    .actions-row{display:flex;justify-content:flex-end;gap:12px;margin-top:16px}
+
+    /* === MODAL === */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;
+      justify-content:center;align-items:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s}
+    .modal-overlay.show{opacity:1;pointer-events:auto}
+    .modal-box{background:var(--panel-solid);border:1px solid var(--accent);border-radius:var(--radius);padding:28px;
+      max-width:700px;width:95%;max-height:85vh;overflow-y:auto;transform:scale(.9);transition:transform .3s}
+    .modal-overlay.show .modal-box{transform:scale(1)}
+    .modal-title{font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+    .modal-tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--text2);border:none;background:none;cursor:pointer;
+      position:relative;font-family:inherit}
+    .modal-tab.active{color:var(--accent)}
+    .modal-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent)}
+    .modal-pane{display:none} .modal-pane.active{display:block}
+
+    /* === ROSTER EDITOR === */
+    .roster-row{display:grid;grid-template-columns:80px 1fr 50px;gap:8px;align-items:center;margin-bottom:6px}
+    .roster-row input{padding:7px 10px;font-size:13px}
+    .roster-del{padding:6px 10px;border:none;background:rgba(239,68,68,.15);color:var(--red);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600}
+    .roster-del:hover{background:rgba(239,68,68,.3)}
+
+    /* === GAS CODE BLOCK === */
+    .code-block{background:#1e1e2e;color:#cdd6f4;border-radius:var(--radius-sm);padding:16px;font-family:'Cascadia Code','Fira Code',monospace;
+      font-size:12px;line-height:1.5;overflow-x:auto;max-height:400px;overflow-y:auto;white-space:pre;margin:10px 0}
+    body.light .code-block{background:#f8f8f8;color:#333}
+
+    /* === DESIGN-R === */
+    .designr-item{padding:12px 0;border-bottom:1px solid var(--border)}
+    .designr-label{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .designr-label .item-code{background:var(--accent);color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+
+    /* === TOAST === */
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(16,185,129,.95);
+      color:#fff;padding:14px 24px;border-radius:12px;font-weight:600;font-size:14px;z-index:2000;
+      box-shadow:0 10px 25px rgba(0,0,0,.4);transition:transform .4s cubic-bezier(.175,.885,.32,1.275)}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+
+    /* === FILTER BAR === */
+    .filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    .filter-chip{padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1px solid var(--border);
+      background:var(--input-bg);color:var(--text2);cursor:pointer;transition:all .2s;font-family:inherit}
+    .filter-chip:hover,.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+    /* === LOADING === */
+    .loading{text-align:center;padding:40px;color:var(--text2)}
+    .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;
+      animation:spin .8s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* === PRINT === */
+    @media print{
+      body{background:#fff!important;color:#000!important}
+      .header,.tab-nav,.hdr-btn,.btn,.actions-row,.help-panel,.filter-bar,.toast,.modal-overlay{display:none!important}
+      .main{padding:10px!important}
+      .tab-content{display:block!important}
+      .panel{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid}
+      .stat-card{border:1px solid #ccc!important}
+      .stat-num{color:#000!important}
+    }
+
+    /* === ANIMATIONS === */
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .4s ease}
+
+    /* === ULCER LIST === */
+    .ulcer-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;margin:2px}
+    .ulcer-chip.active-ulcer{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+    .ulcer-chip.healed{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+    .dash-ulcer-row:hover, .dash-reminder-row:hover, .karte-ulcer-card:hover{background:var(--hover);cursor:pointer}
+
+    /* === ACTIVE ULCER MANAGEMENT PANEL === */
+    .ulcer-mgmt-card{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;
+      cursor:pointer;transition:all .2s;border-left:4px solid var(--red)}
+    .ulcer-mgmt-card:hover{background:rgba(128,128,128,.08);transform:translateX(4px)}
+    .ulcer-mgmt-card.healed-card{border-left-color:var(--green);opacity:.7}
+    .ulcer-mgmt-card .umg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .ulcer-mgmt-card .umg-room{font-size:15px;font-weight:700}
+    .ulcer-mgmt-card .umg-days{font-size:12px;color:var(--text2);background:var(--input-bg);padding:2px 8px;border-radius:8px}
+    .ulcer-mgmt-card .umg-detail{font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .ulcer-mgmt-card .umg-score{font-weight:800;font-size:16px}
+    .ulcer-mgmt-card .umg-trend{font-size:12px;font-weight:600}
+    .ulcer-count-badge{font-size:28px;font-weight:800;color:var(--red)}
+
+    /* === TIMELINE === */
+    .timeline{position:relative;padding-left:24px}
+    .timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border)}
+    .tl-item{position:relative;padding:10px 0 10px 16px;border-bottom:none}
+    .tl-item::before{content:'';position:absolute;left:-21px;top:14px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--panel-solid);z-index:1}
+    .tl-item.tl-first::before{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.4)}
+    .tl-item.tl-healed::before{background:var(--green);box-shadow:0 0 8px rgba(16,185,129,.4)}
+    .tl-item .tl-date{font-size:12px;color:var(--text3);font-weight:600}
+    .tl-item .tl-score{font-size:14px;font-weight:700;margin:2px 0}
+    .tl-item .tl-note{font-size:12px;color:var(--text2);line-height:1.4;margin-top:2px}
+    .tl-item .tl-treatment{font-size:11px;color:var(--text2);background:var(--input-bg);padding:4px 8px;border-radius:6px;margin-top:4px;display:inline-block}
+
+    /* === STATUS BADGES === */
+    .status-badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+    .status-new{background:rgba(239,68,68,.15);color:var(--red)}
+    .status-treating{background:rgba(245,158,11,.15);color:var(--orange)}
+    .status-improving{background:rgba(59,130,246,.15);color:var(--accent)}
+    .status-healed{background:rgba(16,185,129,.15);color:var(--green)}
+
+    /* === RESPONSIVE === */
+    @media(max-width:700px){
+      .header{padding:10px 16px} .main{padding:16px} .tab-nav{padding:0 12px}
+      .selector-row{grid-template-columns:1fr} .panel{padding:16px}
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="header">
+    <h1>🛡️ 褥瘡無くそうアプリ</h1>
+    <div class="header-r">
+      <div id="demo-badge-wrap" style="display:none;align-items:center;gap:8px;background:var(--orange-g);border:1px solid var(--orange);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:var(--orange);margin-right:8px">
+        🧪 デモモード中
+        <button id="btn-reset-demo" class="btn btn-sec btn-sm" style="padding:2px 8px;font-size:10px;border-color:var(--orange);color:var(--orange);background:none;cursor:pointer">実データに戻す</button>
+      </div>
+      <button class="hdr-btn" id="btn-settings">⚙️ 設定</button>
+      <button class="hdr-btn" id="btn-theme"><span id="theme-icon">☀️</span> <span id="theme-text">ライト</span></button>
+      <span class="date-disp" id="date-disp"></span>
+    </div>
+  </div>
+
+  <!-- TAB NAV -->
+  <div class="tab-nav" id="tab-nav">
+    <button class="tab-btn" data-tab="braden">📝 ブレーデン入力</button>
+    <button class="tab-btn active" data-tab="dashboard">📊 ダッシュボード</button>
+    <button class="tab-btn" data-tab="ranking">🏆 リスクランキング</button>
+    <button class="tab-btn" data-tab="designr">🩹 DESIGN-R記録</button>
+    <button class="tab-btn" data-tab="karte">👤 個人カルテ</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ====== TAB 1: BRADEN INPUT ====== -->
+    <div class="tab-content" id="tab-braden">
+      <div class="two-col">
+        <div>
+          <div class="panel">
+            <div class="selector-row four-cols">
+              <div class="field-group"><label class="field-label">部屋番号</label>
+                <select id="braden-room"><option value="">選択</option></select></div>
+              <div class="field-group"><label class="field-label">評価日</label>
+                <input type="date" id="braden-date"></div>
+              <div class="field-group"><label class="field-label">評価スタッフ</label>
+                <input type="text" id="braden-staff" placeholder="氏名"></div>
+              <div class="field-group"><label class="field-label">利用者氏名</label>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="name-display" id="braden-name">—</div>
+                  <button class="btn btn-sec btn-sm" id="braden-to-karte-btn" style="display:none;padding:2px 8px;font-size:10px">👤 カルテ</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="braden-items"></div>
+
+            <div class="field-group" style="margin-top:16px">
+              <label class="field-label">特記事項</label>
+              <textarea id="braden-note" placeholder="皮膚の状態、既存の褥瘡の有無、補足情報など"></textarea>
+            </div>
+          </div>
+
+          <!-- Score Display -->
+          <div class="score-display" id="braden-score-display">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:4px">合計点</div>
+            <div class="score-total" id="braden-total">23</div>
+            <div class="risk-badge" id="braden-risk" style="background:var(--green);color:#fff">🟢 リスクなし</div>
+          </div>
+
+          <!-- Care Recommendations -->
+          <div class="panel care-recs" id="care-recs-panel" style="display:none">
+            <div class="panel-title">🩺 推奨される予防ケアプログラム</div>
+            <div id="care-recs-body"></div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn btn-sec" id="braden-reset">クリア</button>
+            <button class="btn btn-sec" id="braden-copy">📋 コピー</button>
+            <button class="btn btn-primary" id="braden-submit">📤 送信して保存</button>
+          </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="sticky-col">
+          <div class="help-panel" id="braden-help">
+            <div class="help-header">💡 <span id="help-title">判定アシスタント</span></div>
+            <div class="help-body" id="help-body">
+              <p style="color:var(--text2)">各評価項目にマウスを乗せる（またはタップする）と、詳細な臨床基準がここに表示されます。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== TAB 2: DASHBOARD ====== -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="panel">
+        <div class="panel-title">📊 リスク分布サマリー</div>
+        <div class="stat-grid" id="dash-stats"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="panel">
+          <div class="panel-title">🔔 評価リマインダー</div>
+          <div id="dash-reminders"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🩹 現在褥瘡発生中</div>
+          <div id="dash-active-ulcers"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== TAB 3: RANKING ====== -->
+    <div class="tab-content" id="tab-ranking">
+      <div class="panel">
+        <div class="panel-title">🏆 リスクランキング（合計点の低い順）</div>
+        <div class="filter-bar" id="rank-filter"></div>
+        <div id="rank-list"></div>
+      </div>
+    </div>
+
+    <!-- ====== TAB 4: DESIGN-R ====== -->
+    <div class="tab-content" id="tab-designr">
+      <!-- Active Ulcer Management Panel -->
+      <div class="panel" id="ulcer-mgmt-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="panel-title" style="margin-bottom:0">🩹 褥瘡発生者リスト</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="text-align:center"><div class="ulcer-count-badge" id="ulcer-count">0</div><div style="font-size:11px;color:var(--text2)">件 発生中</div></div>
+          </div>
+        </div>
+        <div id="ulcer-mgmt-list"></div>
+        <div id="ulcer-mgmt-empty" style="text-align:center;padding:20px;color:var(--text2);font-size:13px">✅ 現在、褥瘡が発生している入居者はいません</div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="panel">
+            <div class="panel-title">🩹 DESIGN-R® 褥瘡評価記録</div>
+            <div class="selector-row">
+              <div class="field-group"><label class="field-label">部屋番号</label>
+                <select id="dr-room"><option value="">選択</option></select></div>
+              <div class="field-group"><label class="field-label">評価日</label>
+                <input type="date" id="dr-date"></div>
+              <div class="field-group"><label class="field-label">利用者氏名</label>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="name-display" id="dr-name">—</div>
+                  <button class="btn btn-sec btn-sm" id="dr-to-karte-btn" style="display:none;padding:2px 8px;font-size:10px">👤 カルテ</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+              <div class="field-group"><label class="field-label">褥瘡ID（同一人物の複数褥瘡を区別）</label>
+                <select id="dr-ulcer-id"><option value="new">＋ 新規褥瘡を登録</option></select></div>
+              <div class="field-group"><label class="field-label">発生部位</label>
+                <select id="dr-site">
+                  <option value="">選択</option><option>仙骨部</option><option>尾骨部</option>
+                  <option>踵（右）</option><option>踵（左）</option><option>大転子（右）</option><option>大転子（左）</option>
+                  <option>坐骨（右）</option><option>坐骨（左）</option><option>肩甲骨</option><option>後頭部</option>
+                  <option>耳介</option><option>肘</option><option>その他</option>
+                </select>
+                <input type="text" id="dr-site-other" placeholder="具体的な部位を入力してください" style="display:none;margin-top:8px">
+              </div>
+            </div>
+
+            <div id="designr-items"></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+              <div class="field-group"><label class="field-label">処置内容</label>
+                <select id="dr-treatment">
+                  <option value="">選択</option>
+                  <option>洗浄のみ</option>
+                  <option>洗浄＋軟膏塗布</option>
+                  <option>洗浄＋ドレッシング材貼付</option>
+                  <option>デブリードマン実施</option>
+                  <option>陰圧閉鎖療法（NPWT）</option>
+                  <option>その他</option>
+                </select>
+                <input type="text" id="dr-treatment-other" placeholder="具体的な処置内容を入力してください" style="display:none;margin-top:8px">
+              </div>
+              <div class="field-group"><label class="field-label">使用ドレッシング材</label>
+                <select id="dr-dressing">
+                  <option value="">選択</option>
+                  <option>フィルム材（テガダーム等）</option>
+                  <option>ハイドロコロイド（デュオアクティブ等）</option>
+                  <option>ポリウレタンフォーム（メピレックス等）</option>
+                  <option>アルギン酸塩（カルトスタット等）</option>
+                  <option>ハイドロジェル</option>
+                  <option>ハイドロファイバー（アクアセル等）</option>
+                  <option>ガーゼ</option>
+                  <option>その他</option>
+                </select>
+                <input type="text" id="dr-dressing-other" placeholder="具体的な使用ドレッシング材を入力してください" style="display:none;margin-top:8px">
+              </div>
+            </div>
+            <div class="field-group" style="margin-top:8px">
+              <label class="field-label">備考</label>
+              <textarea id="dr-note" placeholder="創部の状態、軟膏名、体圧分散用具の変更、医師への報告内容など"></textarea>
+            </div>
+
+            <div class="score-display" id="dr-score-display">
+              <div style="font-size:13px;color:var(--text2);margin-bottom:4px">DESIGN-R 合計点</div>
+              <div class="score-total" id="dr-total">0</div>
+              <div id="dr-severity" style="font-size:14px;color:var(--text2);margin-top:4px"></div>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-sec" id="dr-mark-healed" style="display:none">✅ 治癒済みにする</button>
+              <button class="btn btn-primary" id="dr-submit">📤 記録を保存</button>
+            </div>
+          </div>
+        </div>
+        <div class="sticky-col">
+          <div class="help-panel" id="dr-help">
+            <div class="help-header">💡 <span id="dr-help-title">DESIGN-R 判定アシスタント</span></div>
+            <div class="help-body" id="dr-help-body">
+              <p style="color:var(--text2)">各評価項目にマウスを乗せると、詳細な判定基準がここに表示されます。</p>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:16px">
+            <div class="panel-title">📈 経過トレンド</div>
+            <div class="chart-container"><canvas id="dr-chart"></canvas></div>
+          </div>
+          <div class="panel" style="margin-top:16px">
+            <div class="panel-title">📋 経過タイムライン</div>
+            <div id="dr-timeline" class="timeline"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== TAB 5: PERSONAL KARTE ====== -->
+    <div class="tab-content" id="tab-karte">
+      <div class="panel">
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:20px">
+          <div class="field-group" style="width:180px;margin-bottom:0">
+            <select id="karte-room"><option value="">部屋番号を選択</option></select>
+          </div>
+          <div class="name-display" id="karte-name" style="font-size:22px">—</div>
+        </div>
+      </div>
+      <div id="karte-content" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="panel">
+            <div class="panel-title">📈 ブレーデンスケール推移</div>
+            <div id="karte-braden-summary" style="margin-bottom:12px"></div>
+            <div class="chart-container"><canvas id="karte-braden-chart"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🩺 現在の推奨ケア</div>
+            <div id="karte-care"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🩹 褥瘡発生履歴</div>
+          <div id="karte-ulcer-history"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📋 ブレーデン評価履歴一覧</div>
+          <div class="tbl-wrap"><table class="data-tbl" id="karte-braden-tbl">
+            <thead><tr><th>評価日</th><th>知覚</th><th>湿潤</th><th>活動性</th><th>可動性</th><th>栄養</th><th>摩擦</th><th>合計</th><th>リスク</th><th>スタッフ</th></tr></thead>
+            <tbody id="karte-braden-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div id="karte-empty" class="panel" style="text-align:center;padding:60px;color:var(--text2)">
+        ⬆️ 部屋番号を選択すると、個人カルテが表示されます。
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SETTINGS MODAL ====== -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px">
+        <div class="modal-title" style="margin:0;font-size:18px">⚙️ アプリの設定</div>
+        <button class="btn btn-sec btn-sm" id="modal-close-top" style="padding:6px 12px;font-size:12px;font-weight:700;border-color:var(--accent);color:var(--accent);cursor:pointer">❌ 設定を閉じる</button>
+      </div>
+      <div class="modal-tabs" style="margin-bottom:16px">
+        <button class="modal-tab active" data-mtab="roster">名簿管理</button>
+        <button class="modal-tab" data-mtab="print">印刷レポート</button>
+        <button class="modal-tab" data-mtab="system-config" style="color:var(--text3)">⚙️ システム設定</button>
+      </div>
+
+      <!-- Roster (Default Active) -->
+      <div class="modal-pane active" id="mtab-roster">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px">現在の入居者を編集します。退所にする場合は「退所処理」ボタンを押してください。</p>
+        
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--accent)">👥 現在の入居者リスト</div>
+        <div id="roster-editor" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;margin-bottom:16px"></div>
+        
+        <div class="actions-row" style="margin-bottom:20px">
+          <button class="btn btn-sec btn-sm" id="roster-add">＋ 新規入所者を行追加</button>
+          <button class="btn btn-sec btn-sm" id="roster-init">初期名簿を一括書き出し</button>
+          <button class="btn btn-primary btn-sm" id="roster-save">💾 名簿を保存する</button>
+        </div>
+
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--text3);border-top:1px solid var(--border);padding-top:16px">📁 退所者アーカイブ</div>
+        <div id="roster-out-archive" style="max-height:130px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;background:var(--input-bg);font-size:12px;color:var(--text2)">
+        </div>
+      </div>
+
+      <!-- Print -->
+      <div class="modal-pane" id="mtab-print">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px">褥瘡対策委員会向けの全体サマリーレポートを印刷用に生成します。</p>
+        <button class="btn btn-primary" id="btn-print-report" style="margin-bottom:16px;width:100%">🖨️ カンファレンスレポートを印刷</button>
+        <div style="border-top:1px dashed var(--border);padding-top:16px;margin-top:12px">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:8px"><strong>🧪 デモ・動作確認用</strong><br>アプリの動作検証のために、10名分のサンプルデータ（ブレーデンスケール評価履歴とDESIGN-R経過観察・治癒記録）をローカルストレージに流し込みます。</p>
+          <button class="btn btn-sec btn-sm" id="btn-load-sample" style="border-color:var(--orange);color:var(--orange)">デモ用サンプルデータを投入する</button>
+        </div>
+      </div>
+
+      <!-- System Config (GAS URL & GAS Code Combined) -->
+      <div class="modal-pane" id="mtab-system-config">
+        <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:10px;margin-bottom:16px">
+          <p style="font-size:12px;color:var(--red);margin:0;font-weight:700;line-height:1.4">
+            ⚠️ 警告: ここはシステム管理者専用の設定エリアです。接続設定を書き換えるとスプレッドシートへの保存ができなくなります。通常は操作しないでください。
+          </p>
+        </div>
+        
+        <div class="field-group" style="margin-bottom:12px">
+          <label class="field-label">GASウェブアプリの公開URL</label>
+          <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div class="actions-row" style="margin-bottom:16px">
+          <button class="btn btn-sec btn-sm" id="gas-test">🔗 接続テスト</button>
+          <button class="btn btn-primary btn-sm" id="gas-save">保存</button>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px">
+          <label class="field-label">コピペ用Google Apps Script (GAS) コード</label>
+          <button class="btn btn-sec btn-sm" id="copy-gas-code" style="margin-bottom:8px;font-size:11px">📋 コードをコピー</button>
+          <div class="code-block" id="gas-code-display" style="max-height:150px;overflow-y:auto;font-size:11px"></div>
+        </div>
+      </div>
+
+      <div class="actions-row" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+        <button class="btn btn-primary" id="modal-close" style="width:100%;font-weight:700;font-size:14px">⚙️ 設定画面を閉じる</button>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+// ========================================
+// DATA & CONSTANTS
+// ========================================
+const DEFAULT_RESIDENTS = {
+  "201":"長田徳太郎","202":"榮岩雄","203":"宮下惠美","204":"高橋絹代","205":"南ミ",
+  "206":"岩川富子","207":"濱田等","208":"森信子","209":"上塘伊砂子","210":"坂元ルミ",
+  "211":"辻正子","212":"内野トシ子","213":"有馬マサ子","214":"五反田和子","215":"川之上チエ",
+  "216":"三重逸男","217":"有川光子","218":"田畑チヅ子","219":"山之内勝郎","220":"牧ミエ子",
+  "301":"上木信代","302":"中島勲","303":"八木幸一","304":"山口京子","305":"片平稔",
+  "306":"松尾明","307":"谷村國勝","308":"西川美保子","309":"林タマエ","310":"飯野嘉子",
+  "311":"中村恭子","312":"浦口イツ子","313":"内カル","314":"西田京子","315":"江里口由美子",
+  "316":"齋藤千佐代","317":"林シゲ子","318":"赤崎信子","319":"川添久江","320":"吉田美智",
+  "401":"和田ミツ子","402":"芳原トモ子","403":"肥後カツ子","404":"中嶋紀子","405":"岡元サチ",
+  "406":"濱里道子","407":"岡村和子","408":"有田まり子","409":"柿木田勝巳","410":"田原秀子",
+  "411":"前原才二","412":"神菌久光","413":"羽田野静子","414":"古川英子","415":"田畑ノブ子",
+  "416":"山倉晶子","417":"黒岩和子","418":"山元スズ","419":"稲富サダ子","420":"中禮三重子",
+  "501":"高濱美知子","502":"林潤一","503":"岩元敏子","504":"上大田艷子","505":"石川キヨ子",
+  "506":"宮川洋子","507":"土佐謙芳","508":"加治原マサ子","509":"柳田アヤ子","510":"中條フミ子",
+  "511":"前田ノリ子","512":"川路清則","513":"川井田トミ","514":"岩川登","515":"七搦敏行",
+  "516":"島元秀二郎","517":"松山静明","518":"榊千鶴子","519":"瀬戸山トシ子","520":"栁父順二"
+};
+
+let residents = JSON.parse(localStorage.getItem('jokuso_residents') || 'null') || {...DEFAULT_RESIDENTS};
+let bradenHistory = JSON.parse(localStorage.getItem('jokuso_braden') || '[]');
+let designrHistory = JSON.parse(localStorage.getItem('jokuso_designr') || '[]');
+
+function saveLocal(){
+  localStorage.setItem('jokuso_residents', JSON.stringify(residents));
+  localStorage.setItem('jokuso_braden', JSON.stringify(bradenHistory));
+  localStorage.setItem('jokuso_designr', JSON.stringify(designrHistory));
+}
+
+// ---- Braden Scale Schema ----
+const bradenSchema = [
+  {id:'知覚のズレ', label:'知覚のズレ', max:4, options:[
+    {val:1,short:'1: 全く知覚なし',desc:'痛みに対する反応がない（意識レベルの低下や鎮静により）。または体表面の大部分に感覚障害がある。'},
+    {val:2,short:'2: 重度の障害',desc:'痛みの刺激にのみ反応する。不快感を言葉でうまく伝えられないか、体表面の1/2以上に感覚障害がある。'},
+    {val:3,short:'3: 軽度の障害',desc:'指示に従えるが、不快感や体位変換の必要性を常に伝えられるとは限らない。または四肢の1〜2本に感覚障害がある。'},
+    {val:4,short:'4: 障害なし',desc:'指示に従え、痛みや不快感に適切に反応し、言葉で伝えることができる。感覚障害がない。'}
+  ]},
+  {id:'湿潤', label:'湿潤', max:4, options:[
+    {val:1,short:'1: 常に湿っている',desc:'発汗・尿などにより、皮膚がほとんど常に湿潤している。体位変換のたびに湿潤が確認される。'},
+    {val:2,short:'2: たいてい湿っている',desc:'常にではないが、頻繁に皮膚が湿っている。少なくとも1日に1回はリネンの交換が必要。'},
+    {val:3,short:'3: 時々湿っている',desc:'皮膚は通常乾燥しているが、定期的なリネン交換が1日1回程度必要。'},
+    {val:4,short:'4: めったに湿っていない',desc:'皮膚は通常乾燥している。リネンの交換は定期的な交換スケジュールでよい。'}
+  ]},
+  {id:'活動性', label:'活動性', max:4, options:[
+    {val:1,short:'1: 臥床',desc:'ベッド上のみで過ごしている。'},
+    {val:2,short:'2: 座位可能',desc:'歩行能力はほとんどないか、非常に限られている。自力で体重を支えることができない。椅子や車椅子に座ることができる。'},
+    {val:3,short:'3: 時々歩行可能',desc:'介助の有無に関わらず、日中時々短い距離を歩くことがある。1回の歩行で2時間以上は離床可能。'},
+    {val:4,short:'4: 歩行可能',desc:'少なくとも1日に2回は居室の外を歩く。2時間おきに少なくとも1度は居室内を歩く。'}
+  ]},
+  {id:'可動性', label:'可動性', max:4, options:[
+    {val:1,short:'1: 全く体動なし',desc:'介助なしでは体幹や四肢の位置をわずかも変えることができない。'},
+    {val:2,short:'2: 非常に限られる',desc:'時々わずかに体幹や四肢の位置を変えるが、自分だけでは頻繁に、または大きく位置を変えられない。'},
+    {val:3,short:'3: やや限られる',desc:'自分で頻繁にわずかに体幹や四肢の位置を変える。'},
+    {val:4,short:'4: 自由に体動する',desc:'介助なしに頻繁に大きく体位を変える。'}
+  ]},
+  {id:'栄養状態', label:'栄養状態', max:4, options:[
+    {val:1,short:'1: 不良',desc:'食事をほとんど完食しない。提供量の1/3以上食べることはめったにない。1日のタンパク質摂取量は2サービング以下。水分摂取量も不足。栄養補助食品を摂取していないか、絶食中。'},
+    {val:2,short:'2: やや不良',desc:'めったに全量摂取しない。通常、提供量の約1/2しか食べない。タンパク質の摂取量は1日に3サービング程度。時に栄養補助食品を摂取する。'},
+    {val:3,short:'3: 良好',desc:'ほとんどの食事で半量以上を摂取する。1日に4サービング以上のタンパク質を摂取。食事を抜くことはほとんどない。'},
+    {val:4,short:'4: 非常に良好',desc:'毎食ほとんどの提供量を完食する。食間にも食事を摂る。栄養補助は不要。'}
+  ]},
+  {id:'摩擦とズレ', label:'摩擦とズレ', max:3, options:[
+    {val:1,short:'1: 問題あり',desc:'移動時にベッドや椅子の上で身体を引きずるため、かなりの介助が必要。シーツでずり落ちることがよくある。痙縮や拘縮が頻繁に摩擦を引き起こす。'},
+    {val:2,short:'2: 潜在的に問題あり',desc:'弱々しいながらも動くか、最小限の介助が必要。移動時、皮膚がシーツや椅子、その他の器具でこすれやすい。ほとんどの時間、比較的良い姿勢を維持できる。'},
+    {val:3,short:'3: 問題なし',desc:'ベッド上や椅子の上で自力で動くことができ、移動時も自分で身体を完全に挙上できるだけの十分な筋力がある。常にベッドや椅子上で良い姿勢を維持できる。'}
+  ]}
+];
+
+// ---- DESIGN-R Schema ----
+const designrSchema = [
+  {id:'D', label:'深さ (Depth)', options:[
+    {val:0,code:'d0',short:'d0: 皮膚損傷・発赤なし',desc:'圧迫を受けた皮膚に発赤や損傷が認められない。'},
+    {val:1,code:'d1',short:'d1: 持続する発赤',desc:'指押し法で消退しない発赤がある。'},
+    {val:2,code:'d2',short:'d2: 真皮までの損傷',desc:'真皮（表皮下層）までの損傷。水疱を含む。'},
+    {val:3,code:'D3',short:'D3: 皮下組織までの損傷',desc:'皮下脂肪層にまで達する全層性の皮膚損傷。'},
+    {val:4,code:'D4',short:'D4: 皮下組織を超える損傷',desc:'筋肉、腱にまで達する損傷。'},
+    {val:5,code:'D5',short:'D5: 関節腔・体腔に至る損傷',desc:'関節腔や体腔（骨が見える）にまで達する損傷。'},
+    {val:'U',code:'DU',short:'DU: 壊死組織で深さ判定不能',desc:'壊死組織で覆われており、創底の深さの判定ができない。'}
+  ]},
+  {id:'E', label:'滲出液 (Exudate)', options:[
+    {val:0,code:'e0',short:'e0: なし',desc:'滲出液が認められない。'},
+    {val:1,code:'e1',short:'e1: 少量',desc:'毎日のドレッシング交換を要さない程度の少量の滲出液。'},
+    {val:3,code:'e3',short:'e3: 中等量',desc:'1日1回のドレッシング交換が必要な量の滲出液。'},
+    {val:6,code:'E6',short:'E6: 多量',desc:'1日2回以上のドレッシング交換が必要な多量の滲出液。'}
+  ]},
+  {id:'S', label:'大きさ (Size)', type:'size', options:[
+    {val:0,short:'s0: 皮膚損傷なし',range:'なし'},
+    {val:3,short:'s3: 4未満',range:'4未満'},
+    {val:6,short:'s6: 4以上16未満',range:'4以上16未満'},
+    {val:8,short:'s8: 16以上36未満',range:'16以上36未満'},
+    {val:9,short:'s9: 36以上64未満',range:'36以上64未満'},
+    {val:12,short:'s12: 64以上100未満',range:'64以上100未満'},
+    {val:15,short:'S15: 100以上',range:'100以上'}
+  ]},
+  {id:'I', label:'炎症/感染 (Inflammation/Infection)', options:[
+    {val:0,code:'i0',short:'i0: 局所の炎症徴候なし',desc:'創周囲に炎症の徴候（発赤・腫脹・熱感・疼痛）がない。'},
+    {val:1,code:'i1',short:'i1: 局所の炎症徴候あり',desc:'創周囲に発赤・腫脹・熱感・疼痛がある。'},
+    {val:3,code:'i3/I3',short:'i3: 局所の明らかな感染徴候あり',desc:'膿、悪臭、創周囲の蜂窩織炎など、明らかな局所の感染徴候がある。'},
+    {val:9,code:'I9',short:'I9: 全身的影響あり',desc:'敗血症など全身に影響を及ぼす重篤な感染がある。'}
+  ]},
+  {id:'G', label:'肉芽組織 (Granulation)', options:[
+    {val:0,code:'g0',short:'g0: 創が治癒/浅い/DTI疑い',desc:'創が治癒した場合、または創が浅い場合（d1, d2）、DTI疑いの場合。'},
+    {val:1,code:'g1',short:'g1: 良性肉芽90%以上',desc:'良性肉芽が創面の90%以上を占める。'},
+    {val:3,code:'g3',short:'g3: 良性肉芽50%以上90%未満',desc:'良性肉芽が創面の50%以上90%未満を占める。'},
+    {val:4,code:'G4',short:'G4: 良性肉芽10%以上50%未満',desc:'良性肉芽が創面の10%以上50%未満を占める。'},
+    {val:5,code:'G5',short:'G5: 良性肉芽10%未満',desc:'良性肉芽が創面の10%未満。'},
+    {val:6,code:'G6',short:'G6: 良性肉芽なし',desc:'良性肉芽が全く形成されていない。'}
+  ]},
+  {id:'N', label:'壊死組織 (Necrotic tissue)', options:[
+    {val:0,code:'n0',short:'n0: 壊死組織なし',desc:'壊死組織がない。'},
+    {val:3,code:'N3',short:'N3: 柔らかい壊死組織あり',desc:'柔らかい壊死組織（黄色壊死）が認められる。'},
+    {val:6,code:'N6',short:'N6: 硬く厚い壊死組織あり',desc:'硬く厚い、密着した壊死組織（黒色壊死）が認められる。'}
+  ]},
+  {id:'P', label:'ポケット (Pocket)', options:[
+    {val:0,code:'p0',short:'p0: ポケットなし',desc:'ポケット（創の周辺部で壊死により生じた空洞）がない。'},
+    {val:6,code:'P6',short:'P6: 4cm未満',desc:'ポケットの全周長が4cm未満。'},
+    {val:9,code:'P9',short:'P9: 4以上16未満',desc:'ポケットの全周長が4cm以上16cm未満。'},
+    {val:12,code:'P12',short:'P12: 16以上36未満',desc:'ポケットの全周長が16cm以上36cm未満。'},
+    {val:24,code:'P24',short:'P24: 36以上',desc:'ポケットの全周長が36cm以上。'}
+  ]}
+];
+
+// ---- Care Recommendations ----
+const careRecommendations = {
+  '知覚のズレ': {
+    threshold: 2,
+    items: [
+      {title:'定期的な皮膚観察', body:'感覚障害のある部位を毎日観察し、発赤・水疱・変色の有無を確認してください。'},
+      {title:'体圧分散用具の使用', body:'体圧分散マットレスやクッションの導入を検討してください。'},
+      {title:'体位変換スケジュールの厳守', body:'2時間ごとの体位変換を確実に実施し、記録してください。'}
+    ]
+  },
+  '湿潤': {
+    threshold: 2,
+    items: [
+      {title:'撥水性クリームの塗布', body:'骨突出部や臀部に撥水性のスキンケアクリームを塗布し、皮膚バリアを保護してください。'},
+      {title:'高吸収パッドへの変更', body:'尿パッドやオムツを高吸収タイプに変更し、交換頻度を適切に設定してください。'},
+      {title:'皮膚の清潔保持', body:'清拭時は弱酸性の洗浄剤を使用し、皮膚を過度にこすらないよう注意してください。'}
+    ]
+  },
+  '活動性': {
+    threshold: 2,
+    items: [
+      {title:'2時間ごとの体位変換', body:'体位変換スケジュールを作成し、2時間ごとに確実に実施・記録してください。'},
+      {title:'離床の促進', body:'可能な範囲で車椅子や端座位など、ベッドから離れる時間を増やしてください。'},
+      {title:'体圧分散マットレスの導入', body:'高機能の体圧分散マットレス（エアマットなど）の使用を検討してください。'}
+    ]
+  },
+  '可動性': {
+    threshold: 2,
+    items: [
+      {title:'ポジショニングの工夫', body:'クッションやピローを使い、骨突出部への圧迫を避けるポジショニングを実施してください。'},
+      {title:'関節可動域訓練', body:'拘縮予防のための他動関節可動域訓練を毎日実施してください。'},
+      {title:'体圧分散用具の見直し', body:'現在使用しているマットレスやクッションが適切か、再評価してください。'}
+    ]
+  },
+  '栄養状態': {
+    threshold: 2,
+    items: [
+      {title:'管理栄養士への相談', body:'栄養状態の改善プランについて管理栄養士に相談してください。'},
+      {title:'高タンパク・高カロリー食の提供', body:'創傷治癒に必要なタンパク質とカロリーを確保するため、食事内容を見直してください。'},
+      {title:'栄養補助食品の検討', body:'エンシュアやメイバランスなどの栄養補助食品の追加を検討してください。'}
+    ]
+  },
+  '摩擦とズレ': {
+    threshold: 2,
+    items: [
+      {title:'移乗・移動技術の見直し', body:'移乗時にスライディングシートやボードを使用し、皮膚をこすらないようにしてください。'},
+      {title:'ベッドの頭部挙上角度の制限', body:'ベッド頭部挙上は30度以下に保ち、ずり落ちによるズレ力を軽減してください。'},
+      {title:'適切なシーティング', body:'車椅子の姿勢を定期的に調整し、ずっこけ座りを防止してください。'}
+    ]
+  }
+};
+
+// ---- Risk Level Helpers ----
+function getRiskLevel(score){
+  if(score<=9) return {label:'極めて高度なリスク', color:'var(--red)', emoji:'🔴', cls:'risk-critical'};
+  if(score<=12) return {label:'高度リスク', color:'var(--orange)', emoji:'🟠', cls:'risk-high'};
+  if(score<=14) return {label:'中等度リスク', color:'var(--yellow)', emoji:'🟡', cls:'risk-moderate'};
+  if(score<=17) return {label:'軽度リスク', color:'var(--accent)', emoji:'🔵', cls:'risk-mild'};
+  return {label:'リスクなし', color:'var(--green)', emoji:'🟢', cls:'risk-none'};
+}
+function getRiskColor(score){return getRiskLevel(score).color}
+
+// ---- GAS Communication ----
+function getGasUrl(){ return localStorage.getItem('jokuso_gas_url') || '' }
+
+async function gasGet(action){
+  const url = getGasUrl();
+  if(!url) return null;
+  try{
+    const r = await fetch(`${url}?action=${action}`, {mode:'cors'});
+    return await r.json();
+  }catch(e){console.error('GAS GET error:',e); return null}
+}
+
+async function gasPost(payload){
+  const url = getGasUrl();
+  if(!url){showToast('⚙️ 設定画面からGAS URLを設定してください','warn');return false}
+  try{
+    await fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    return true;
+  }catch(e){console.error('GAS POST error:',e);showToast('送信エラーが発生しました','error');return false}
+}
+
+// ========================================
+// INITIALIZATION
+// ========================================
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // Date display
+  const now = new Date();
+  document.getElementById('date-disp').textContent = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+  document.getElementById('braden-date').value = now.toISOString().split('T')[0];
+  document.getElementById('dr-date').value = now.toISOString().split('T')[0];
+
+  // Theme
+  if(localStorage.getItem('jokuso_theme')==='light') document.body.classList.add('light');
+  updateThemeBtn();
+
+  // Demo mode check
+  if(localStorage.getItem('jokuso_demo_mode')==='true'){
+    document.getElementById('demo-badge-wrap').style.display = 'flex';
+  }
+
+  // Try to load from GAS
+  await loadFromGAS();
+
+  // Build UI
+  populateRoomSelects();
+  renderBradenForm();
+  renderDesignRForm();
+  renderDashboard();
+  renderRanking();
+  renderGASCode();
+
+  // Event listeners
+  setupEventListeners();
+});
+
+async function loadFromGAS(){
+  if(localStorage.getItem('jokuso_demo_mode') === 'true') return;
+  if(!getGasUrl()) return;
+  try{
+    const data = await gasGet('getInitData');
+    if(data){
+      const hasLocal = Object.keys(residents).length > 0;
+      if(!hasLocal && data.roster && Object.keys(data.roster).length>0){
+        residents = data.roster;
+      }
+      // GAS側にデータが1件以上ある場合のみローカルデータを上書きする
+      const hasGasData = (data.bradenHistory && data.bradenHistory.length > 0) || 
+                         (data.designrHistory && data.designrHistory.length > 0);
+      if(hasGasData){
+        bradenHistory = data.bradenHistory || [];
+        designrHistory = data.designrHistory || [];
+        saveLocal();
+      }
+    }
+  }catch(e){console.error(e)}
+}
+
+function populateRoomSelects(){
+  const allRooms = Object.keys(residents).sort((a,b)=>a.localeCompare(b));
+  
+  ['braden-room','dr-room','karte-room'].forEach(selId=>{
+    const sel = document.getElementById(selId);
+    if(!sel) return;
+    const firstOpt = sel.options[0];
+    sel.innerHTML = '';
+    sel.appendChild(firstOpt);
+    
+    const floors = {'2':[],'3':[],'4':[],'5':[]};
+    allRooms.forEach(r=>{
+      const isOut = r.startsWith('OUT_');
+      if(isOut && (selId === 'braden-room' || selId === 'dr-room')) return;
+      
+      const nameVal = residents[r];
+      if(!nameVal) return;
+      
+      const cleanRoom = isOut ? r.split('_')[1] : r;
+      const f = cleanRoom.charAt(0);
+      if(floors[f]) floors[f].push({ key: r, roomNum: cleanRoom, isOut });
+    });
+    
+    Object.entries(floors).forEach(([f, rooms])=>{
+      if(rooms.length===0) return;
+      const og = document.createElement('optgroup');
+      og.label = `${f}階`;
+      rooms.forEach(rm=>{
+        const o = document.createElement('option');
+        o.value = rm.key;
+        if(rm.isOut){
+          o.textContent = `${rm.roomNum}号室 (${residents[rm.key]} 様・退所者)`;
+        } else {
+          o.textContent = `${rm.roomNum}号室`;
+        }
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    });
+  });
+}
+
+// ========================================
+// TAB SWITCHING
+// ========================================
+function setupEventListeners(){
+  // Tab nav
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+      if(btn.dataset.tab==='dashboard') renderDashboard();
+      if(btn.dataset.tab==='ranking') renderRanking();
+      if(btn.dataset.tab==='designr') renderActiveUlcerPanel();
+    });
+  });
+
+  // Theme
+  document.getElementById('btn-theme').addEventListener('click',()=>{
+    document.body.classList.toggle('light');
+    localStorage.setItem('jokuso_theme', document.body.classList.contains('light')?'light':'dark');
+    updateThemeBtn();
+  });
+
+  // Braden room change
+  document.getElementById('braden-room').addEventListener('change', e=>{
+    const r = e.target.value;
+    document.getElementById('braden-name').textContent = r && residents[r] ? `${residents[r]} 様` : '—';
+    document.getElementById('braden-to-karte-btn').style.display = r ? 'inline-block' : 'none';
+    showPrevBraden(r);
+  });
+
+  // Design-R room change
+  document.getElementById('dr-room').addEventListener('change', e=>{
+    const r = e.target.value;
+    document.getElementById('dr-name').textContent = r && residents[r] ? `${residents[r]} 様` : '—';
+    document.getElementById('dr-to-karte-btn').style.display = r ? 'inline-block' : 'none';
+    updateDRUlcerSelect(r);
+    renderDRChart(r);
+  });
+
+  document.getElementById('dr-site').addEventListener('change', e=>{
+    const v = e.target.value;
+    document.getElementById('dr-site-other').style.display = v === 'その他' ? 'block' : 'none';
+  });
+
+  document.getElementById('dr-treatment').addEventListener('change', e=>{
+    const v = e.target.value;
+    document.getElementById('dr-treatment-other').style.display = v === 'その他' ? 'block' : 'none';
+  });
+
+  document.getElementById('dr-dressing').addEventListener('change', e=>{
+    const v = e.target.value;
+    document.getElementById('dr-dressing-other').style.display = v === 'その他' ? 'block' : 'none';
+  });
+
+  // Karte room change
+  document.getElementById('karte-room').addEventListener('change', e=>{
+    const r = e.target.value;
+    if(r){
+      document.getElementById('karte-name').textContent = `${residents[r]} 様`;
+      document.getElementById('karte-content').style.display = '';
+      document.getElementById('karte-empty').style.display = 'none';
+      renderKarte(r);
+    } else {
+      document.getElementById('karte-name').textContent = '—';
+      document.getElementById('karte-content').style.display = 'none';
+      document.getElementById('karte-empty').style.display = '';
+    }
+  });
+
+  // Braden actions
+  document.getElementById('braden-submit').addEventListener('click', handleBradenSubmit);
+  document.getElementById('braden-copy').addEventListener('click', handleBradenCopy);
+  document.getElementById('braden-reset').addEventListener('click', handleBradenReset);
+
+  // Design-R actions
+  document.getElementById('dr-submit').addEventListener('click', handleDRSubmit);
+  document.getElementById('dr-mark-healed').addEventListener('click', handleDRHeal);
+  document.getElementById('dr-ulcer-id').addEventListener('change', e=>{
+    const v = e.target.value;
+    document.getElementById('dr-mark-healed').style.display = v!=='new' ? '' : 'none';
+    if(v!=='new') {
+      loadExistingUlcer(v);
+    } else {
+      document.getElementById('dr-site').value = '';
+      document.getElementById('dr-site-other').value = '';
+      document.getElementById('dr-site-other').style.display = 'none';
+      document.getElementById('dr-treatment').value = '';
+      document.getElementById('dr-treatment-other').value = '';
+      document.getElementById('dr-treatment-other').style.display = 'none';
+      document.getElementById('dr-dressing').value = '';
+      document.getElementById('dr-dressing-other').value = '';
+      document.getElementById('dr-dressing-other').style.display = 'none';
+    }
+  });
+
+  document.getElementById('dr-to-karte-btn').addEventListener('click', ()=>{
+    const r = document.getElementById('dr-room').value;
+    if(r) jumpToKarte(r);
+  });
+
+  document.getElementById('braden-to-karte-btn').addEventListener('click', ()=>{
+    const r = document.getElementById('braden-room').value;
+    if(r) jumpToKarte(r);
+  });
+
+  // Settings modal
+  document.getElementById('btn-settings').addEventListener('click',()=>document.getElementById('modal-settings').classList.add('show'));
+  document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal-settings').classList.remove('show'));
+  document.getElementById('modal-close-top').addEventListener('click',()=>document.getElementById('modal-settings').classList.remove('show'));
+  document.querySelectorAll('.modal-tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.modal-tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.modal-pane').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('mtab-'+t.dataset.mtab).classList.add('active');
+      if(t.dataset.mtab==='roster') renderRosterEditor();
+    });
+  });
+  document.getElementById('gas-save').addEventListener('click',()=>{
+    localStorage.setItem('jokuso_gas_url', document.getElementById('gas-url-input').value.trim());
+    showToast('GAS URLを保存しました');
+  });
+  document.getElementById('gas-url-input').value = getGasUrl();
+  document.getElementById('gas-test').addEventListener('click', async()=>{
+    const data = await gasGet('getInitData');
+    if(data) showToast('✅ 接続成功！データを取得しました');
+    else showToast('❌ 接続に失敗しました。URLを確認してください','error');
+  });
+
+  // Roster
+  document.getElementById('roster-add').addEventListener('click',()=>{
+    const ed = document.getElementById('roster-editor');
+    const rowHTML = rosterRowHTML('','');
+    ed.insertAdjacentHTML('beforeend', rowHTML);
+    const newRow = ed.lastElementChild;
+    attachRosterOutEvent(newRow);
+  });
+  document.getElementById('roster-init').addEventListener('click', async()=>{
+    if(!confirm('全80名の初期名簿データをスプレッドシートに書き出します。よろしいですか？')) return;
+    const ok = await gasPost({action:'updateRoster', roster: DEFAULT_RESIDENTS});
+    if(ok){
+      residents = {...DEFAULT_RESIDENTS};
+      saveLocal();
+      populateRoomSelects();
+      renderDashboard();
+      renderRanking();
+      renderActiveUlcerPanel();
+      renderRosterEditor();
+      showToast('初期名簿を書き出しました');
+    }
+  });
+  document.getElementById('roster-save').addEventListener('click', async()=>{
+    const rows = document.querySelectorAll('.roster-row');
+    const newR = {};
+    Object.entries(residents).forEach(([k, v])=>{
+      if(k.startsWith('OUT_')) newR[k] = v;
+    });
+    rows.forEach(row=>{
+      const rInput = row.querySelector('.roster-room-input')?.value.trim();
+      const nInput = row.querySelector('.roster-name-input')?.value.trim();
+      if(rInput && nInput) {
+        newR[rInput] = nInput;
+      }
+    });
+    residents = newR;
+    saveLocal();
+    populateRoomSelects();
+    renderDashboard();
+    renderRanking();
+    renderActiveUlcerPanel();
+    renderRosterEditor();
+    const ok = await gasPost({action:'updateRoster', roster: residents});
+    showToast(ok ? '名簿を保存しました' : '名簿をローカルに保存しました（GAS未接続）');
+  });
+
+  // GAS Code copy
+  document.getElementById('copy-gas-code').addEventListener('click',()=>{
+    const code = document.getElementById('gas-code-display').textContent;
+    navigator.clipboard.writeText(code).then(()=>showToast('GASコードをコピーしました'));
+  });
+
+  // Print
+  document.getElementById('btn-print-report').addEventListener('click', handlePrintReport);
+
+  // Demo sample data
+  document.getElementById('btn-load-sample').addEventListener('click', () => {
+    if (!confirm('デモ用のサンプルデータ（10名分、複数評価履歴）をローカルに投入します。既存のローカルデータは上書きされますが、よろしいですか？')) return;
+    
+    const sampleBraden = [
+      { date: '2026-01-10', room: '301', staff: '看護師A', '知覚のズレ': 3, '湿潤': 3, '活動性': 2, '可動性': 2, '栄養状態': 3, '摩擦とズレ': 2, total: 15, risk: '軽度リスク', note: '半年前の評価（現在評価期限切れアラート表示用）' },
+      { date: '2026-02-18', room: '304', staff: '介護士B', '知覚のズレ': 2, '湿潤': 3, '活動性': 2, '可動性': 2, '栄養状態': 2, '摩擦とズレ': 2, total: 13, risk: '中等度リスク', note: '5ヶ月前の評価（間近アラート表示用）' },
+      { date: '2026-06-15', room: '201', staff: '看護師A', '知覚のズレ': 3, '湿潤': 3, '活動性': 2, '可動性': 2, '栄養状態': 3, '摩擦とズレ': 2, total: 15, risk: '軽度リスク', note: '' },
+      { date: '2026-07-10', room: '201', staff: '看護師A', '知覚のズレ': 2, '湿潤': 2, '活動性': 1, '可動性': 1, '栄養状態': 2, '摩擦とズレ': 1, total: 9, risk: '極めて高度なリスク', note: '全身状態の低下に伴い寝たきり状態に移行' },
+      { date: '2026-07-12', room: '203', staff: '介護士C', '知覚のズレ': 2, '湿潤': 3, '活動性': 1, '可動性': 2, '栄養状態': 2, '摩擦とズレ': 2, total: 12, risk: '高度リスク', note: '右踵に軽度の発赤を確認' },
+      { date: '2026-07-15', room: '205', staff: '看護師B', '知覚のズレ': 2, '湿潤': 2, '活動性': 2, '可動性': 2, '栄養状態': 2, '摩擦とズレ': 1, total: 11, risk: '高度リスク', note: '左大転子部に圧赤あり' },
+      { date: '2026-07-14', room: '302', staff: '看護師A', '知覚のズレ': 1, '湿潤': 1, '活動性': 1, '可動性': 1, '栄養状態': 1, '摩擦とズレ': 1, total: 6, risk: '極めて高度なリスク', note: '完全寝たきりで失禁多量。尾骨部発赤' },
+      { date: '2026-07-10', room: '306', staff: '介護士B', '知覚のズレ': 3, '湿潤': 2, '活動性': 2, '可動性': 2, '栄養状態': 3, '摩擦とズレ': 2, total: 14, risk: '中等度リスク', note: '座位時間が長く坐骨に発赤あり' },
+      { date: '2026-07-08', room: '401', staff: '介護士C', '知覚のズレ': 3, '湿潤': 3, '活動性': 2, '可動性': 1, '栄養状態': 2, '摩擦とズレ': 2, total: 13, risk: '中等度リスク', note: '' },
+      { date: '2026-07-13', room: '403', staff: '看護師B', '知覚のズレ': 2, '湿潤': 3, '活動性': 1, '可動性': 1, '栄養状態': 3, '摩擦とズレ': 2, total: 12, risk: '高度リスク', note: '' },
+      { date: '2026-05-10', room: '501', staff: '看護師A', '知覚のズレ': 3, '湿潤': 3, '活動性': 2, '可動性': 2, '栄養状態': 3, '摩擦とズレ': 2, total: 15, risk: '軽度リスク', note: '仙骨部褥瘡発生時のブレーデン評価' },
+      { date: '2026-07-11', room: '503', staff: '介護士A', '知覚のズレ': 2, '湿潤': 3, '活動性': 1, '可動性': 2, '栄養状態': 2, '摩擦とズレ': 1, total: 11, risk: '高度リスク', note: '' },
+      { date: '2026-07-05', room: '506', staff: '看護師B', '知覚のズレ': 3, '湿潤': 3, '活動性': 2, '可動性': 2, '栄養状態': 2, '摩擦とズレ': 2, total: 14, risk: '中等度リスク', note: '' }
+    ];
+
+    const sampleDesignR = [
+      { date: '2026-07-10', room: '201', ulcerId: 'U201A', site: '仙骨部', D: 3, E: 3, S: 6, S_l: 3, S_w: 3, I: 1, G: 4, N: 3, P: 0, total: 20, status: '経過観察中', treatment: '洗浄＋軟膏塗布', dressing: 'フィルム材（テガダーム等）', note: '仙骨部に壊死組織を伴う全層性損傷。ゲーベンクリーム塗布。' },
+      { date: '2026-07-17', room: '201', ulcerId: 'U201A', site: '仙骨部', D: 3, E: 1, S: 3, S_l: 1.5, S_w: 1.5, I: 0, G: 3, N: 0, P: 0, total: 10, status: '経過観察中', treatment: '洗浄＋ドレッシング材貼付', dressing: 'ハイドロコロイド（デュオアクティブ等）', note: '壊死組織消失。滲出液も減少、良性肉芽が増加。' },
+      
+      { date: '2026-07-12', room: '203', ulcerId: 'U203A', site: '踵（右）', D: 2, E: 1, S: 3, S_l: 1.5, S_w: 1.0, I: 0, G: 0, N: 0, P: 0, total: 6, status: '経過観察中', treatment: '洗浄＋軟膏塗布', dressing: 'ガーゼ', note: '右踵に水疱形成あり。亜鉛華軟膏で保護。' },
+      { date: '2026-07-18', room: '203', ulcerId: 'U203A', site: '踵（右）', D: 1, E: 0, S: 3, S_l: 1.0, S_w: 0.5, I: 0, G: 0, N: 0, P: 0, total: 4, status: '経過観察中', treatment: '洗浄のみ', dressing: 'フィルム材（テガダーム等）', note: '水疱は吸収され、上皮化が進んでいる。' },
+
+      { date: '2026-07-15', room: '205', ulcerId: 'U205A', site: '大転子（左）', D: 3, E: 3, S: 6, S_l: 4, S_w: 3, I: 1, G: 4, N: 3, P: 0, total: 20, status: '経過観察中', treatment: '洗浄＋軟膏塗布', dressing: 'ポリウレタンフォーム（メピレックス等）', note: '左側臥位による圧迫痕。除圧を徹底。' },
+
+      { date: '2026-07-14', room: '302', ulcerId: 'U302A', site: '尾骨部', D: 4, E: 6, S: 9, S_l: 6, S_w: 6, I: 3, G: 5, N: 6, P: 6, total: 39, status: '経過観察中', treatment: 'デブリードマン実施', dressing: 'アルギン酸塩（カルトスタット等）', note: '悪臭を伴う重度の感染、黒色壊死組織あり。一部ポケット形成。毎日洗浄及びドレッシング交換。' },
+
+      { date: '2026-07-10', room: '306', ulcerId: 'U306A', site: '坐骨（右）', D: 2, E: 3, S: 6, S_l: 4, S_w: 2, I: 1, G: 0, N: 0, P: 0, total: 12, status: '経過観察中', treatment: '洗浄＋ドレッシング材貼付', dressing: 'ハイドロコロイド（デュオアクティブ等）', note: '車椅子乗車時の坐骨圧迫。クッション調整指示。' },
+
+      { date: '2026-07-08', room: '401', ulcerId: 'U401A', site: '肩甲骨', D: 1, E: 0, S: 3, S_l: 2.0, S_w: 1.0, I: 0, G: 0, N: 0, P: 0, total: 4, status: '経過観察中', treatment: '洗浄のみ', dressing: 'その他', note: '軽度発赤のみ。体位変換ピローにて除圧。' },
+
+      { date: '2026-07-13', room: '403', ulcerId: 'U403A', site: '後頭部', D: 2, E: 1, S: 3, S_l: 1.5, S_w: 1.5, I: 0, G: 0, N: 0, P: 0, total: 6, status: '経過観察中', treatment: '洗浄＋軟膏塗布', dressing: 'ガーゼ', note: '背臥位維持による後頭部褥瘡。ポジショニング調整。' },
+
+      { date: '2026-05-10', room: '501', ulcerId: 'U501A', site: '仙骨部', D: 2, E: 1, S: 3, S_l: 2.0, S_w: 1.5, I: 0, G: 0, N: 0, P: 0, total: 6, status: '経過観察中', treatment: '洗浄＋軟膏塗布', dressing: 'ガーゼ', note: '浅い褥瘡を確認。' },
+      { date: '2026-05-25', room: '501', ulcerId: 'U501A', site: '仙骨部', D: 1, E: 0, S: 3, S_l: 1.0, S_w: 1.0, I: 0, G: 0, N: 0, P: 0, total: 4, status: '経過観察中', treatment: '洗浄のみ', dressing: 'フィルム材（テガダーム等）', note: '赤みのみとなり縮小。' },
+      { date: '2026-06-10', room: '501', ulcerId: 'U501A', site: '仙骨部', D: 0, E: 0, S: 0, S_l: 0, S_w: 0, I: 0, G: 0, N: 0, P: 0, total: 0, status: '治癒済み', treatment: '洗浄のみ', dressing: '', note: '完全に上皮化し治癒した。' },
+
+      { date: '2026-07-11', room: '503', ulcerId: 'U503A', site: '踵（left）', D: 2, E: 3, S: 6, S_l: 4.0, S_w: 2.0, I: 1, G: 0, N: 0, P: 0, total: 12, status: '経過観察中', treatment: '洗浄＋軟膏塗布', dressing: 'ポリウレタンフォーム（メピレックス等）', note: '踵部除圧用クッションを使用開始。' },
+
+      { date: '2026-07-05', room: '506', ulcerId: 'U506A', site: '肘', D: 1, E: 1, S: 3, S_l: 1.5, S_w: 1.0, I: 0, G: 0, N: 0, P: 0, total: 5, status: '経過観察中', treatment: '洗浄のみ', dressing: 'フィルム材（テガダーム等）', note: '肘の摩擦対策に保護パット貼付。' }
+    ];
+
+    bradenHistory = sampleBraden;
+    designrHistory = sampleDesignR;
+    localStorage.setItem('jokuso_demo_mode', 'true');
+    saveLocal();
+    showToast('🧪 サンプルデータ（10名分）を投入しました！画面をリロードします。');
+    setTimeout(() => location.reload(), 1500);
+  });
+
+  // Reset demo mode
+  const resetDemoBtn = document.getElementById('btn-reset-demo');
+  if(resetDemoBtn){
+    resetDemoBtn.addEventListener('click', ()=>{
+      localStorage.removeItem('jokuso_demo_mode');
+      localStorage.removeItem('jokuso_braden');
+      localStorage.removeItem('jokuso_designr');
+      showToast('実データ同期に戻します。画面をリロードします。');
+      setTimeout(()=>location.reload(), 1500);
+    });
+  }
+}
+
+function updateThemeBtn(){
+  const isLight = document.body.classList.contains('light');
+  document.getElementById('theme-icon').textContent = isLight ? '🌙' : '☀️';
+  document.getElementById('theme-text').textContent = isLight ? 'ダーク' : 'ライト';
+}
+
+// ========================================
+// BRADEN FORM
+// ========================================
+function renderBradenForm(){
+  const container = document.getElementById('braden-items');
+  container.innerHTML = bradenSchema.map(item=>`
+    <div class="braden-row" data-id="${item.id}">
+      <div class="braden-label">${item.label}</div>
+      <div>
+        <div class="score-btns">
+          ${item.options.map(o=>`
+            <div class="score-btn">
+              <input type="radio" id="b-${item.id}-${o.val}" name="b-${item.id}" value="${o.val}" ${o.val===item.max?'checked':''}>
+              <label for="b-${item.id}-${o.val}">${o.short}</label>
+            </div>
+          `).join('')}
+        </div>
+        <div class="braden-prev" id="prev-${item.id}"></div>
+      </div>
+    </div>
+  `).join('');
+
+  // Events
+  container.querySelectorAll('.braden-row').forEach(row=>{
+    row.addEventListener('mouseenter', ()=>showBradenHelp(row.dataset.id));
+    row.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('change', updateBradenScore);
+      inp.addEventListener('focus', ()=>showBradenHelp(row.dataset.id));
+    });
+  });
+  updateBradenScore();
+}
+
+function showBradenHelp(itemId){
+  const schema = bradenSchema.find(s=>s.id===itemId);
+  if(!schema) return;
+  document.getElementById('help-title').textContent = schema.label;
+  const currentVal = parseInt(document.querySelector(`input[name="b-${itemId}"]:checked`)?.value || '0');
+  let html = '';
+  schema.options.forEach(o=>{
+    const hl = o.val === currentVal;
+    html += `<div class="help-item ${hl?'hl':''}"><div class="help-item-t">${hl?'▶ ':''}${o.short}</div><div>${o.desc}</div></div>`;
+  });
+  document.getElementById('help-body').innerHTML = html;
+}
+
+function updateBradenScore(){
+  let total = 0;
+  bradenSchema.forEach(item=>{
+    const v = document.querySelector(`input[name="b-${item.id}"]:checked`);
+    if(v) total += parseInt(v.value);
+  });
+  document.getElementById('braden-total').textContent = total;
+  const risk = getRiskLevel(total);
+  const badge = document.getElementById('braden-risk');
+  badge.textContent = `${risk.emoji} ${risk.label}`;
+  badge.style.background = risk.color;
+  badge.style.color = '#fff';
+
+  // Update care recs
+  renderCareRecommendations();
+}
+
+function renderCareRecommendations(){
+  const body = document.getElementById('care-recs-body');
+  const panel = document.getElementById('care-recs-panel');
+  let html = '';
+  bradenSchema.forEach(item=>{
+    const v = parseInt(document.querySelector(`input[name="b-${item.id}"]:checked`)?.value || item.max);
+    const rec = careRecommendations[item.id];
+    if(rec && v <= rec.threshold){
+      rec.items.forEach(r=>{
+        html += `<div class="care-card"><div class="care-card-title">⚠️ ${item.label}（${v}点）→ ${r.title}</div><div class="care-card-body">${r.body}</div></div>`;
+      });
+    }
+  });
+  body.innerHTML = html || '<p style="color:var(--text2);font-size:13px">現在、特別な介入が推奨される低スコア項目はありません。</p>';
+  panel.style.display = html ? '' : 'none';
+}
+
+function showPrevBraden(room){
+  if(!room) return;
+  const prev = bradenHistory.filter(h=>h.room===room).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  bradenSchema.forEach(item=>{
+    const el = document.getElementById(`prev-${item.id}`);
+    if(!prev){el.innerHTML='';return}
+    const prevVal = prev[item.id];
+    const curVal = parseInt(document.querySelector(`input[name="b-${item.id}"]:checked`)?.value);
+    if(prevVal!==undefined){
+      let arrow = '<span class="arrow-same">→</span>';
+      if(curVal < prevVal) arrow = '<span class="arrow-down">↓低下</span>';
+      else if(curVal > prevVal) arrow = '<span class="arrow-up">↑改善</span>';
+      el.innerHTML = `前回: ${prevVal}点 ${arrow}`;
+    }
+  });
+}
+
+async function handleBradenSubmit(){
+  const room = document.getElementById('braden-room').value;
+  if(!room){alert('部屋番号を選択してください');return}
+  const staff = document.getElementById('braden-staff').value.trim();
+  if(!staff){
+    alert('評価スタッフの氏名を入力してください（未記入は送信できません）');
+    document.getElementById('braden-staff').focus();
+    return;
+  }
+  if(!confirm(`${room}号室 ${residents[room]}様の評価を送信します。よろしいですか？`)) return;
+
+  const btn = document.getElementById('braden-submit');
+  btn.disabled = true;
+  btn.textContent = '⌛ 保存中...';
+
+  try {
+    const entry = {
+      date: document.getElementById('braden-date').value || new Date().toISOString().split('T')[0],
+      room,
+      name: residents[room] || '',
+      staff: document.getElementById('braden-staff').value.trim(),
+      note: document.getElementById('braden-note').value.trim()
+    };
+    let total = 0;
+    bradenSchema.forEach(item=>{
+      const v = parseInt(document.querySelector(`input[name="b-${item.id}"]:checked`)?.value || 0);
+      entry[item.id] = v;
+      total += v;
+    });
+    entry.total = total;
+    entry.risk = getRiskLevel(total).label;
+
+    bradenHistory.push(entry);
+    saveLocal();
+
+    const ok = await gasPost({action:'saveAssessment', data:entry});
+    showToast(ok ? '✅ スプレッドシートに保存しました！' : '💾 ローカルに保存しました（GAS未接続）');
+    handleBradenReset();
+  } catch (err) {
+    console.error(err);
+    showToast('❌ 保存処理中にエラーが発生しました');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📤 送信して保存';
+  }
+}
+
+function handleBradenCopy(){
+  const room = document.getElementById('braden-room').value;
+  if(!room){alert('部屋番号を選択してください');return}
+  let total = 0;
+  let text = `【ブレーデンスケール評価】\n部屋: ${room}号室 ${residents[room]}様\n`;
+  const staff = document.getElementById('braden-staff').value.trim();
+  if(staff) text += `評価者: ${staff}\n`;
+  text += `評価日: ${new Date().toISOString().split('T')[0]}\n\n`;
+  bradenSchema.forEach(item=>{
+    const v = parseInt(document.querySelector(`input[name="b-${item.id}"]:checked`)?.value || 0);
+    total += v;
+    text += `${item.label}: ${v}点\n`;
+  });
+  text += `\n合計: ${total}点 → ${getRiskLevel(total).label}\n`;
+  const note = document.getElementById('braden-note').value.trim();
+  if(note) text += `\n特記: ${note}\n`;
+  navigator.clipboard.writeText(text).then(()=>showToast('📋 コピーしました'));
+}
+
+function handleBradenReset(){
+  document.getElementById('braden-room').value = '';
+  document.getElementById('braden-name').textContent = '—';
+  document.getElementById('braden-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('braden-staff').value = '';
+  document.getElementById('braden-note').value = '';
+  bradenSchema.forEach(item=>{
+    const maxOpt = item.options.find(o=>o.val===item.max);
+    const radio = document.getElementById(`b-${item.id}-${maxOpt.val}`);
+    if(radio) radio.checked = true;
+    document.getElementById(`prev-${item.id}`).innerHTML = '';
+  });
+  updateBradenScore();
+}
+
+// ========================================
+// DASHBOARD
+// ========================================
+function renderDashboard(){
+  // Get latest braden per room
+  const latest = {};
+  bradenHistory.forEach(h=>{
+    if(!latest[h.room] || h.date > latest[h.room].date) latest[h.room] = h;
+  });
+
+  const counts = {critical:0, high:0, moderate:0, mild:0, none:0, uneval:0};
+  const total = Object.keys(residents).length;
+  const now = new Date();
+
+  const reminders = {red:[], yellow:[], uneval:[]};
+
+  Object.keys(residents).forEach(room=>{
+    const entry = latest[room];
+    if(!entry){
+      counts.uneval++;
+      reminders.uneval.push(room);
+      return;
+    }
+    const score = entry.total;
+    if(score<=9) counts.critical++;
+    else if(score<=12) counts.high++;
+    else if(score<=14) counts.moderate++;
+    else if(score<=17) counts.mild++;
+    else counts.none++;
+
+    const evalDate = new Date(entry.date.replace(/-/g, '/'));
+    const diffDays = Math.floor((now - evalDate) / (1000*60*60*24));
+    if(diffDays >= 180) reminders.red.push({room, days:diffDays});
+    else if(diffDays >= 150) reminders.yellow.push({room, days:diffDays});
+  });
+
+  // Stats
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num" style="color:var(--red)">${counts.critical}</div><div class="stat-label"><span class="stat-dot" style="background:var(--red)"></span>極めて高度なリスク</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${counts.high}</div><div class="stat-label"><span class="stat-dot" style="background:var(--orange)"></span>高度リスク</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--yellow)">${counts.moderate}</div><div class="stat-label"><span class="stat-dot" style="background:var(--yellow)"></span>中等度リスク</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${counts.mild}</div><div class="stat-label"><span class="stat-dot" style="background:var(--accent)"></span>軽度リスク</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${counts.none}</div><div class="stat-label"><span class="stat-dot" style="background:var(--green)"></span>リスクなし</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--text3)">${counts.uneval}</div><div class="stat-label"><span class="stat-dot" style="background:var(--text3)"></span>未評価</div></div>
+  `;
+
+  // Reminders
+  let remHtml = '';
+  if(reminders.red.length>0){
+    remHtml += `<div style="margin-bottom:12px"><div style="font-weight:700;color:var(--red);font-size:13px;margin-bottom:6px">🔴 6ヶ月以上経過（${reminders.red.length}名）</div>`;
+    reminders.red.sort((a,b)=>b.days-a.days).forEach(r=>{
+      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${r.room}')">${r.room}号室 ${residents[r.room]} — ${r.days}日経過 <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
+    });
+    remHtml += '</div>';
+  }
+  if(reminders.yellow.length>0){
+    remHtml += `<div style="margin-bottom:12px"><div style="font-weight:700;color:var(--yellow);font-size:13px;margin-bottom:6px">🟡 5ヶ月経過（${reminders.yellow.length}名）</div>`;
+    reminders.yellow.forEach(r=>{
+      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${r.room}')">${r.room}号室 ${residents[r.room]} — ${r.days}日経過 <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
+    });
+    remHtml += '</div>';
+  }
+  if(reminders.uneval.length>0){
+    remHtml += `<div><div style="font-weight:700;color:var(--text3);font-size:13px;margin-bottom:6px">⚪ 未評価（${reminders.uneval.length}名）</div>`;
+    reminders.uneval.slice(0,10).forEach(r=>{
+      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${r}')">${r}号室 ${residents[r]} <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
+    });
+    if(reminders.uneval.length>10) remHtml += `<div style="font-size:12px;color:var(--text3);margin-top:4px;padding-left:6px">他${reminders.uneval.length-10}名...</div>`;
+    remHtml += '</div>';
+  }
+  if(!remHtml) remHtml = '<p style="color:var(--green);font-size:13px">✅ 全員の評価が最新です</p>';
+  if(Object.keys(residents).length === 0){
+    remHtml = `
+      <div style="background:rgba(59,130,246,.08);border:1px dashed var(--accent);border-radius:var(--radius-sm);padding:16px;text-align:center;margin-top:10px">
+        <h4 style="margin:0 0 8px 0;color:var(--accent);font-size:14px">👋 はじめてお使いになる方へ</h4>
+        <p style="font-size:12.5px;color:var(--text2);margin:0 0 12px 0;line-height:1.5">
+          まずはアプリ右上の <strong>⚙️設定</strong> ボタンを押して、<strong>名簿管理</strong> から利用者の部屋番号と氏名を入力してください。
+        </p>
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('btn-settings').click()" style="padding:4px 12px;font-size:11px;cursor:pointer">⚙️ 設定を開いて名簿を登録する</button>
+      </div>
+    `;
+  }
+  document.getElementById('dash-reminders').innerHTML = remHtml;
+
+  // Active ulcers
+  const activeUlcers = designrHistory.filter(h=>h.status!=='治癒済み');
+  const ulcerByRoom = {};
+  activeUlcers.forEach(h=>{
+    const key = `${h.room}-${h.ulcerId}`;
+    if(!ulcerByRoom[key] || h.date > ulcerByRoom[key].date) ulcerByRoom[key] = h;
+  });
+  let ulcerHtml = '';
+  const activeEntries = Object.values(ulcerByRoom);
+  if(activeEntries.length>0){
+    ulcerHtml += `<div style="font-weight:700;color:var(--red);font-size:14px;margin-bottom:10px">⚠️ ${activeEntries.length}件の褥瘡が発生中</div>`;
+    activeEntries.sort((a,b)=>b.total-a.total).forEach(u=>{
+      ulcerHtml += `<div style="font-size:13px;padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .2s;border-radius:6px" onclick="jumpToUlcerFromDashboard('${u.room}','${u.ulcerId}')" class="dash-ulcer-row">
+        <span>${u.room}号室 ${residents[u.room]||''} — ${u.site||'部位不明'}</span>
+        <span class="ulcer-chip active-ulcer">DESIGN-R: ${u.total}点</span>
+      </div>`;
+    });
+  } else {
+    ulcerHtml = '<p style="color:var(--green);font-size:13px">✅ 現在、褥瘡が発生している入居者はいません</p>';
+  }
+  document.getElementById('dash-active-ulcers').innerHTML = ulcerHtml;
+}
+
+// ========================================
+// RANKING
+// ========================================
+function renderRanking(){
+  const latest = {};
+  bradenHistory.forEach(h=>{
+    if(!latest[h.room] || h.date > latest[h.room].date) latest[h.room] = h;
+  });
+
+  // Get previous for comparison
+  const prevMap = {};
+  bradenHistory.forEach(h=>{
+    if(!prevMap[h.room]) prevMap[h.room] = [];
+    prevMap[h.room].push(h);
+  });
+
+  let entries = Object.keys(residents).map(room=>{
+    const l = latest[room];
+    const sorted = (prevMap[room]||[]).sort((a,b)=>b.date.localeCompare(a.date));
+    const prev = sorted.length>1 ? sorted[1] : null;
+    return {room, name:residents[room], score: l?l.total:null, date: l?l.date:null, risk: l?getRiskLevel(l.total):null, prevScore: prev?prev.total:null};
+  });
+
+  // Filter
+  const filterBar = document.getElementById('rank-filter');
+  filterBar.innerHTML = `
+    <button class="filter-chip active" data-floor="all">全フロア</button>
+    <button class="filter-chip" data-floor="2">2階</button>
+    <button class="filter-chip" data-floor="3">3階</button>
+    <button class="filter-chip" data-floor="4">4階</button>
+    <button class="filter-chip" data-floor="5">5階</button>
+  `;
+  filterBar.querySelectorAll('.filter-chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      filterBar.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      applyRankFilter(c.dataset.floor, entries);
+    });
+  });
+
+  applyRankFilter('all', entries);
+}
+
+function applyRankFilter(floor, entries){
+  let filtered = floor==='all' ? entries : entries.filter(e=>e.room.charAt(0)===floor);
+  // Sort: evaluated first (by score ascending), then unevaluated
+  filtered.sort((a,b)=>{
+    if(a.score===null && b.score===null) return a.room.localeCompare(b.room);
+    if(a.score===null) return 1;
+    if(b.score===null) return -1;
+    return a.score - b.score;
+  });
+
+  const list = document.getElementById('rank-list');
+  if(filtered.length===0){list.innerHTML='<p style="color:var(--text2);padding:20px">該当なし</p>';return}
+
+  let html = '';
+  filtered.forEach((e,i)=>{
+    if(e.score===null){
+      html += `<div class="rank-row" onclick="jumpToKarte('${e.room}')"><div class="rank-num">${i+1}</div><div style="font-weight:600">${e.room}</div>
+        <div>${e.name}</div><div style="color:var(--text3)">—</div><div style="color:var(--text3)">未評価</div><div></div></div>`;
+      return;
+    }
+    let change = '';
+    if(e.prevScore!==null){
+      const diff = e.score - e.prevScore;
+      if(diff<0) change = `<span style="color:var(--red)">↓${Math.abs(diff)}</span>`;
+      else if(diff>0) change = `<span style="color:var(--green)">↑${diff}</span>`;
+      else change = `<span style="color:var(--text3)">→</span>`;
+    }
+    html += `<div class="rank-row ${e.risk.cls}" onclick="jumpToKarte('${e.room}')">
+      <div class="rank-num">${i+1}</div>
+      <div style="font-weight:600">${e.room}</div>
+      <div>${e.name}</div>
+      <div style="font-weight:800;color:${e.risk.color}">${e.score}点</div>
+      <div><span style="padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:${e.risk.color};color:#fff;white-space:nowrap;">${e.risk.emoji} ${e.risk.label}</span></div>
+      <div>${change}</div>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ========================================
+// DESIGN-R FORM
+// ========================================
+function renderDesignRForm(){
+  const container = document.getElementById('designr-items');
+  container.innerHTML = designrSchema.map(item=>{
+    if(item.type==='size'){
+      return `<div class="designr-item" data-drid="${item.id}">
+        <div class="designr-label"><span class="item-code">${item.id}</span> ${item.label}</div>
+        <div style="display:grid;grid-template-columns:100px 100px 1fr;gap:8px;align-items:center">
+          <div class="field-group" style="margin-bottom:0"><label class="field-label">長径(cm)</label><input type="text" id="dr-s-l" value="0" placeholder="0"></div>
+          <div class="field-group" style="margin-bottom:0"><label class="field-label">短径(cm)</label><input type="text" id="dr-s-w" value="0" placeholder="0"></div>
+          <div style="font-size:13px;color:var(--text2)" id="dr-s-calc">面積: 0 cm² → s0 (0点)</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="designr-item" data-drid="${item.id}">
+      <div class="designr-label"><span class="item-code">${item.id}</span> ${item.label}</div>
+      <div class="score-btns">
+        ${item.options.map(o=>`
+          <div class="score-btn">
+            <input type="radio" id="dr-${item.id}-${o.val}" name="dr-${item.id}" value="${typeof o.val==='string'?o.val:o.val}" ${o.val===0?'checked':''}>
+            <label for="dr-${item.id}-${o.val}">${o.short}</label>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Size calc
+  ['dr-s-l','dr-s-w'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', (e)=>{
+      let val = e.target.value;
+      val = val.replace(/[０-９．，]/g, s => {
+        if (s === '．' || s === '，') return '.';
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+      });
+      val = val.replace(/[^0-9.]/g, '');
+      const parts = val.split('.');
+      if (parts.length > 2) {
+        val = parts[0] + '.' + parts.slice(1).join('');
+      }
+      if (e.target.value !== val) {
+        e.target.value = val;
+      }
+
+      const l = parseFloat(document.getElementById('dr-s-l').value)||0;
+      const w = parseFloat(document.getElementById('dr-s-w').value)||0;
+      const area = l*w;
+      let sScore = 0, sLabel='s0';
+      if(area>=100){sScore=15;sLabel='S15'}
+      else if(area>=64){sScore=12;sLabel='s12'}
+      else if(area>=36){sScore=9;sLabel='s9'}
+      else if(area>=16){sScore=8;sLabel='s8'}
+      else if(area>=4){sScore=6;sLabel='s6'}
+      else if(area>0){sScore=3;sLabel='s3'}
+      document.getElementById('dr-s-calc').textContent = `面積: ${area.toFixed(1)} cm² → ${sLabel} (${sScore}点)`;
+      document.getElementById('dr-s-calc').dataset.score = sScore;
+      updateDRScore();
+    });
+  });
+
+  // Events
+  container.querySelectorAll('.designr-item').forEach(row=>{
+    row.addEventListener('mouseenter', ()=>showDRHelp(row.dataset.drid));
+    row.querySelectorAll('input[type="radio"]').forEach(inp=>{
+      inp.addEventListener('change', updateDRScore);
+      inp.addEventListener('focus', ()=>showDRHelp(row.dataset.drid));
+    });
+  });
+  updateDRScore();
+}
+
+function showDRHelp(itemId){
+  const schema = designrSchema.find(s=>s.id===itemId);
+  if(!schema) return;
+  document.getElementById('dr-help-title').textContent = `${schema.id}: ${schema.label}`;
+  let html = '';
+  if(schema.type==='size'){
+    html = '<div class="help-item hl"><div class="help-item-t">大きさの算出方法</div><div>長径（創面の最大径）× 長径に直交する最大径で面積を算出し、以下の基準で点数化します。<br>0: なし / 3: 4未満 / 6: 4以上16未満 / 8: 16以上36未満 / 9: 36以上64未満 / 12: 64以上100未満 / 15: 100以上</div></div>';
+  } else {
+    const currentVal = document.querySelector(`input[name="dr-${itemId}"]:checked`)?.value;
+    schema.options.forEach(o=>{
+      const hl = String(o.val) === String(currentVal);
+      html += `<div class="help-item ${hl?'hl':''}"><div class="help-item-t">${hl?'▶ ':''}${o.short}</div><div>${o.desc||''}</div></div>`;
+    });
+  }
+  document.getElementById('dr-help-body').innerHTML = html;
+}
+
+function updateDRScore(){
+  let total = 0;
+  let isCritical = false; // 大文字（重症）が含まれるか
+  let isDU = false; // 深さ判定不能か
+  
+  // 深さ D
+  const dVal = document.querySelector('input[name="dr-D"]:checked')?.value;
+  if(dVal === 'U') {
+    isDU = true;
+  } else {
+    const dNum = parseInt(dVal || 0);
+    if(dNum >= 3) isCritical = true;
+    total += dNum;
+  }
+  
+  // 滲出液 E
+  const eVal = parseInt(document.querySelector('input[name="dr-E"]:checked')?.value || 0);
+  if(eVal >= 3) isCritical = true;
+  total += eVal;
+  
+  // サイズ S
+  const sScore = parseInt(document.getElementById('dr-s-calc')?.dataset?.score || 0);
+  if(sScore >= 12) isCritical = true;
+  total += sScore;
+  
+  // 感染 I
+  const iVal = parseInt(document.querySelector('input[name="dr-I"]:checked')?.value || 0);
+  if(iVal >= 3) isCritical = true;
+  total += iVal;
+  
+  // 肉芽 G
+  const gVal = parseInt(document.querySelector('input[name="dr-G"]:checked')?.value || 0);
+  if(gVal >= 3) isCritical = true;
+  total += gVal;
+  
+  // 壊死 N
+  const nVal = parseInt(document.querySelector('input[name="dr-N"]:checked')?.value || 0);
+  if(nVal >= 3) isCritical = true;
+  total += nVal;
+  
+  // ポケット P
+  const pVal = parseInt(document.querySelector('input[name="dr-P"]:checked')?.value || 0);
+  if(pVal >= 6) isCritical = true;
+  total += pVal;
+
+  document.getElementById('dr-total').textContent = total;
+  
+  let badgeHtml = '';
+  if(isDU) {
+    badgeHtml = '<span class="risk-badge" style="background:#6b7280;color:#fff">⚪ 深さ判定不能 (壊死組織)</span>';
+  } else if(total === 0) {
+    badgeHtml = '<span class="risk-badge" style="background:var(--green);color:#fff">🟢 基準以下 (0点)</span>';
+  } else if(isCritical) {
+    badgeHtml = '<span class="risk-badge" style="background:var(--red);color:#fff">🔴 重症 (深在性褥瘡)</span>';
+  } else {
+    badgeHtml = '<span class="risk-badge" style="background:var(--yellow);color:#1f2937">🟡 軽症 (浅在性褥瘡)</span>';
+  }
+  
+  document.getElementById('dr-severity').innerHTML = badgeHtml;
+}
+
+function updateDRUlcerSelect(room){
+  const sel = document.getElementById('dr-ulcer-id');
+  sel.innerHTML = '<option value="new">＋ 新規褥瘡を登録</option>';
+  if(!room) return;
+  const ulcerIds = new Set();
+  designrHistory.filter(h=>h.room===room).forEach(h=>ulcerIds.add(h.ulcerId));
+  ulcerIds.forEach(uid=>{
+    const records = designrHistory.filter(h=>h.room===room && h.ulcerId===uid);
+    const latest = records.sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const status = latest.status==='治癒済み' ? '（治癒済）' : '';
+    const o = document.createElement('option');
+    o.value = uid; o.textContent = `${uid} - ${latest.site||'不明'} ${status}`;
+    sel.appendChild(o);
+  });
+  document.getElementById('dr-mark-healed').style.display = 'none';
+}
+
+function loadExistingUlcer(ulcerId){
+  const room = document.getElementById('dr-room').value;
+  const records = designrHistory.filter(h=>h.room===room && h.ulcerId===ulcerId);
+  const latest = records.sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(!latest) return;
+  
+  const predefinedSites = ['仙骨部', '尾骨部', '踵（右）', '踵（左）', '大転子（右）', '大転子（左）', '坐骨（右）', '坐骨（左）', '肩甲骨', '後頭部', '耳介', '肘'];
+  const siteVal = latest.site || '';
+  if(siteVal === ''){
+    document.getElementById('dr-site').value = '';
+    document.getElementById('dr-site-other').value = '';
+    document.getElementById('dr-site-other').style.display = 'none';
+  } else if(predefinedSites.includes(siteVal)){
+    document.getElementById('dr-site').value = siteVal;
+    document.getElementById('dr-site-other').value = '';
+    document.getElementById('dr-site-other').style.display = 'none';
+  } else {
+    document.getElementById('dr-site').value = 'その他';
+    document.getElementById('dr-site-other').value = siteVal;
+    document.getElementById('dr-site-other').style.display = 'block';
+  }
+
+  // Treatment
+  const predefinedTreatments = ['洗浄のみ', '洗浄＋軟膏塗布', '洗浄＋ドレッシング材貼付', 'デブリードマン実施', '陰圧閉鎖療法（NPWT）'];
+  const treatVal = latest.treatment || '';
+  if(treatVal === ''){
+    document.getElementById('dr-treatment').value = '';
+    document.getElementById('dr-treatment-other').value = '';
+    document.getElementById('dr-treatment-other').style.display = 'none';
+  } else if(predefinedTreatments.includes(treatVal)){
+    document.getElementById('dr-treatment').value = treatVal;
+    document.getElementById('dr-treatment-other').value = '';
+    document.getElementById('dr-treatment-other').style.display = 'none';
+  } else {
+    document.getElementById('dr-treatment').value = 'その他';
+    document.getElementById('dr-treatment-other').value = treatVal;
+    document.getElementById('dr-treatment-other').style.display = 'block';
+  }
+
+  // Dressing
+  const predefinedDressings = ['フィルム材（テガダーム等）', 'ハイドロコロイド（デュオアクティブ等）', 'ポリウレタンフォーム（メピレックス等）', 'アルギン酸塩（カルトスタット等）', 'ハイドロジェル', 'ハイドロファイバー（アクアセル等）', 'ガーゼ'];
+  const dressVal = latest.dressing || '';
+  if(dressVal === ''){
+    document.getElementById('dr-dressing').value = '';
+    document.getElementById('dr-dressing-other').value = '';
+    document.getElementById('dr-dressing-other').style.display = 'none';
+  } else if(predefinedDressings.includes(dressVal)){
+    document.getElementById('dr-dressing').value = dressVal;
+    document.getElementById('dr-dressing-other').value = '';
+    document.getElementById('dr-dressing-other').style.display = 'none';
+  } else {
+    document.getElementById('dr-dressing').value = 'その他';
+    document.getElementById('dr-dressing-other').value = dressVal;
+    document.getElementById('dr-dressing-other').style.display = 'block';
+  }
+  
+  renderDRChart(room, ulcerId);
+}
+
+async function handleDRSubmit(){
+  const room = document.getElementById('dr-room').value;
+  if(!room){alert('部屋番号を選択してください');return}
+  const date = document.getElementById('dr-date').value;
+  const selUlcer = document.getElementById('dr-ulcer-id').value;
+  const ulcerId = selUlcer==='new' ? `U${Date.now().toString(36).toUpperCase()}` : selUlcer;
+  let site = document.getElementById('dr-site').value;
+  if(site === 'その他'){
+    site = document.getElementById('dr-site-other').value.trim() || 'その他';
+  }
+
+  let treatment = document.getElementById('dr-treatment').value;
+  if(treatment === 'その他'){
+    treatment = document.getElementById('dr-treatment-other').value.trim() || 'その他';
+  }
+
+  let dressing = document.getElementById('dr-dressing').value;
+  if(dressing === 'その他'){
+    dressing = document.getElementById('dr-dressing-other').value.trim() || 'その他';
+  }
+
+  const btn = document.getElementById('dr-submit');
+  btn.disabled = true;
+  btn.textContent = '⌛ 保存中...';
+
+  try {
+    const entry = {
+      date, room,
+      name: residents[room] || '',
+      ulcerId, site, status:'経過観察中',
+      treatment,
+      dressing,
+      note: document.getElementById('dr-note').value.trim()
+    };
+    let total = 0;
+    designrSchema.forEach(item=>{
+      if(item.type==='size'){
+        const s = parseInt(document.getElementById('dr-s-calc')?.dataset?.score || 0);
+        entry.S = s; total += s;
+        entry.S_l = parseFloat(document.getElementById('dr-s-l').value)||0;
+        entry.S_w = parseFloat(document.getElementById('dr-s-w').value)||0;
+      } else {
+        const v = document.querySelector(`input[name="dr-${item.id}"]:checked`)?.value;
+        entry[item.id] = v==='U' ? 'U' : parseInt(v||0);
+        if(v && v!=='U') total += parseInt(v);
+      }
+    });
+    entry.total = total;
+
+    designrHistory.push(entry);
+    saveLocal();
+
+    const ok = await gasPost({action:'saveDesignR', data:entry});
+    showToast(ok ? '✅ DESIGN-R記録を保存しました' : '💾 ローカルに保存しました');
+
+    updateDRUlcerSelect(room);
+    document.getElementById('dr-ulcer-id').value = ulcerId;
+    renderDRChart(room, ulcerId);
+    renderActiveUlcerPanel();
+  } catch (err) {
+    console.error(err);
+    showToast('❌ 保存処理中にエラーが発生しました');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📤 記録を保存';
+  }
+}
+
+async function handleDRHeal(){
+  const room = document.getElementById('dr-room').value;
+  const ulcerId = document.getElementById('dr-ulcer-id').value;
+  if(!room || ulcerId==='new') return;
+  if(!confirm('この褥瘡を「治癒済み」にしますか？')) return;
+
+  let site = document.getElementById('dr-site').value;
+  if(site === 'その他'){
+    site = document.getElementById('dr-site-other').value.trim() || 'その他';
+  }
+
+  const entry = {
+    date: document.getElementById('dr-date').value,
+    room, ulcerId, site,
+    status:'治癒済み', note:'治癒済み', D:0,E:0,S:0,I:0,G:0,N:0,P:0, total:0
+  };
+  designrHistory.push(entry);
+  saveLocal();
+  await gasPost({action:'saveDesignR', data:entry});
+  showToast('✅ 治癒済みとして記録しました');
+  updateDRUlcerSelect(room);
+  renderDRChart(room, ulcerId);
+  renderActiveUlcerPanel();
+}
+
+function renderDRChart(room, ulcerId){
+  if(!room) return;
+  const uid = ulcerId || document.getElementById('dr-ulcer-id').value;
+  if(!uid || uid==='new'){
+    document.getElementById('dr-timeline').innerHTML = '<p style="font-size:13px;color:var(--text3);padding:12px">褥瘡を選択すると経過タイムラインが表示されます。</p>';
+    return;
+  }
+
+  const records = designrHistory.filter(h=>h.room===room && h.ulcerId===uid).sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Timeline
+  let tlHtml = '';
+  if(records.length===0){
+    tlHtml = '<p style="font-size:13px;color:var(--text3);padding:12px">まだ記録がありません</p>';
+  } else {
+    const firstDate = records[0].date;
+    records.forEach((r, i)=>{
+      const isFirst = i===0;
+      const isHealed = r.status==='治癒済み';
+      const isLast = i===records.length-1;
+      const prevScore = i>0 ? records[i-1].total : null;
+      let trendText = '';
+      if(prevScore!==null && !isHealed){
+        const diff = r.total - prevScore;
+        if(diff<0) trendText = `<span style="color:var(--green)">▼${Math.abs(diff)}点 改善</span>`;
+        else if(diff>0) trendText = `<span style="color:var(--red)">▲${diff}点 悪化</span>`;
+        else trendText = '<span style="color:var(--text3)">→ 変化なし</span>';
+      }
+      // Days since first
+      const daysSinceStart = Math.floor((new Date(r.date.replace(/-/g, '/')) - new Date(firstDate.replace(/-/g, '/'))) / (1000*60*60*24));
+      // Status badge
+      let statusBadge = '';
+      if(isHealed) statusBadge = '<span class="status-badge status-healed">✅ 治癒</span>';
+      else if(isFirst) statusBadge = '<span class="status-badge status-new">🔴 新規発生</span>';
+      else if(prevScore!==null && r.total < prevScore) statusBadge = '<span class="status-badge status-improving">📈 改善傾向</span>';
+      else statusBadge = '<span class="status-badge status-treating">🟠 治療中</span>';
+
+      let treatmentLine = '';
+      if(r.treatment) treatmentLine += `<span class="tl-treatment">💊 ${r.treatment}</span> `;
+      if(r.dressing) treatmentLine += `<span class="tl-treatment">🩹 ${r.dressing}</span> `;
+
+      tlHtml += `<div class="tl-item ${isFirst?'tl-first':''} ${isHealed?'tl-healed':''}">
+        <div class="tl-date">${r.date}${daysSinceStart>0 ? ` （${daysSinceStart}日目）` : ' （初日）'} ${statusBadge}</div>
+        <div class="tl-score" style="color:${isHealed?'var(--green)':'var(--text)'}">
+          DESIGN-R: ${r.total}点 ${trendText}
+        </div>
+        ${treatmentLine ? `<div style="margin-top:4px">${treatmentLine}</div>` : ''}
+        ${r.note ? `<div class="tl-note">📝 ${r.note}</div>` : ''}
+      </div>`;
+    });
+
+    // Summary line
+    const first = records[0], last = records[records.length-1];
+    const totalDays = Math.floor((new Date(last.date.replace(/-/g, '/')) - new Date(first.date.replace(/-/g, '/'))) / (1000*60*60*24));
+    const scoreChange = last.total - first.total;
+    tlHtml = `<div style="background:var(--input-bg);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <span>📍 ${first.site||'不明'}</span>
+      <span>📅 経過日数: <strong>${totalDays}日</strong></span>
+      <span>📊 初回: ${first.total}点 → 最新: ${last.total}点（${scoreChange>0?'<span style="color:var(--red)">+'+scoreChange+'</span>':'<span style="color:var(--green)">'+scoreChange+'</span>'}）</span>
+      <span>🔄 記録回数: ${records.length}回</span>
+    </div>` + tlHtml;
+  }
+  document.getElementById('dr-timeline').innerHTML = tlHtml;
+
+  // Chart
+  drawLineChart('dr-chart', records.map(r=>r.date), records.map(r=>r.total), 'DESIGN-R合計点', 'var(--red)');
+}
+
+// ========================================
+// ACTIVE ULCER MANAGEMENT PANEL
+// ========================================
+function renderActiveUlcerPanel(){
+  const panel = document.getElementById('ulcer-mgmt-list');
+  const emptyMsg = document.getElementById('ulcer-mgmt-empty');
+  const countEl = document.getElementById('ulcer-count');
+
+  // Collect all active ulcers (latest record per ulcer that is not healed)
+  const ulcerMap = {};
+  designrHistory.forEach(h=>{
+    const key = `${h.room}-${h.ulcerId}`;
+    if(!ulcerMap[key]) ulcerMap[key] = [];
+    ulcerMap[key].push(h);
+  });
+
+  const activeUlcers = [];
+  Object.entries(ulcerMap).forEach(([key, records])=>{
+    records.sort((a,b)=>a.date.localeCompare(b.date));
+    const latest = records[records.length-1];
+    const first = records[0];
+    if(latest.status==='治癒済み') return; // skip healed
+    const daysSince = Math.floor((new Date() - new Date(first.date.replace(/-/g, '/'))) / (1000*60*60*24));
+    const prevScore = records.length>1 ? records[records.length-2].total : null;
+    let trend = '';
+    if(prevScore!==null){
+      const diff = latest.total - prevScore;
+      if(diff<0) trend = `<span class="umg-trend" style="color:var(--green)">▼${Math.abs(diff)} 改善</span>`;
+      else if(diff>0) trend = `<span class="umg-trend" style="color:var(--red)">▲${diff} 悪化</span>`;
+      else trend = '<span class="umg-trend" style="color:var(--text3)">→ 変化なし</span>';
+    } else {
+      trend = '<span class="umg-trend" style="color:var(--orange)">新規</span>';
+    }
+    activeUlcers.push({room: latest.room, ulcerId: latest.ulcerId, site: latest.site||'不明', score: latest.total, days: daysSince, trend, recordCount: records.length, latest});
+  });
+
+  // Also collect healed ulcers for a collapsed section
+  const healedUlcers = [];
+  Object.entries(ulcerMap).forEach(([key, records])=>{
+    records.sort((a,b)=>a.date.localeCompare(b.date));
+    const latest = records[records.length-1];
+    const first = records[0];
+    if(latest.status!=='治癒済み') return;
+    const totalDays = Math.floor((new Date(latest.date.replace(/-/g, '/')) - new Date(first.date.replace(/-/g, '/'))) / (1000*60*60*24));
+    healedUlcers.push({room: latest.room, ulcerId: latest.ulcerId, site: first.site||'不明', totalDays, recordCount: records.length});
+  });
+
+  countEl.textContent = activeUlcers.length;
+
+  if(activeUlcers.length===0 && healedUlcers.length===0){
+    panel.innerHTML = '';
+    emptyMsg.style.display = '';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  // Sort by score descending (most severe first)
+  activeUlcers.sort((a,b)=>b.score-a.score);
+
+  let html = '';
+  activeUlcers.forEach(u=>{
+    html += `<div class="ulcer-mgmt-card" onclick="jumpToUlcer('${u.room}','${u.ulcerId}')">
+      <div class="umg-header">
+        <div class="umg-room">${u.room}号室 ${residents[u.room]||''} — ${u.site}</div>
+        <div class="umg-days">発生から ${u.days}日経過</div>
+      </div>
+      <div class="umg-detail">
+        <span class="umg-score" style="color:var(--red)">DESIGN-R: ${u.score}点</span>
+        ${u.trend}
+        <span>記録: ${u.recordCount}回</span>
+        <span style="font-size:11px;color:var(--accent);font-weight:600">▶ クリックで詳細</span>
+      </div>
+    </div>`;
+  });
+
+  // Healed section
+  if(healedUlcers.length>0){
+    html += `<details style="margin-top:12px"><summary style="font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;padding:8px 0">✅ 治癒済み（${healedUlcers.length}件）</summary><div style="padding-top:8px">`;
+    healedUlcers.forEach(u=>{
+      html += `<div class="ulcer-mgmt-card healed-card" onclick="jumpToUlcer('${u.room}','${u.ulcerId}')">
+        <div class="umg-header">
+          <div class="umg-room">${u.room}号室 ${residents[u.room]||''} — ${u.site}</div>
+          <span class="status-badge status-healed">✅ 治癒済み</span>
+        </div>
+        <div class="umg-detail"><span>治癒期間: ${u.totalDays}日</span><span>記録: ${u.recordCount}回</span></div>
+      </div>`;
+    });
+    html += '</div></details>';
+  }
+
+  panel.innerHTML = html;
+}
+
+function jumpToUlcer(room, ulcerId){
+  document.getElementById('dr-room').value = room;
+  document.getElementById('dr-name').textContent = residents[room] ? `${residents[room]} 様` : '—';
+  document.getElementById('dr-to-karte-btn').style.display = room ? 'inline-block' : 'none';
+  updateDRUlcerSelect(room);
+  document.getElementById('dr-ulcer-id').value = ulcerId;
+  document.getElementById('dr-mark-healed').style.display = '';
+  loadExistingUlcer(ulcerId);
+  // Scroll to form
+  document.querySelector('#tab-designr .two-col').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function jumpToUlcerFromDashboard(room, ulcerId){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  
+  const tabBtn = document.querySelector('.tab-btn[data-tab="designr"]');
+  if(tabBtn) tabBtn.classList.add('active');
+  const tabContent = document.getElementById('tab-designr');
+  if(tabContent) tabContent.classList.add('active');
+  
+  // DESIGN-Rの発生者リストが更新されていることを保証するため一度描画
+  renderActiveUlcerPanel();
+  
+  jumpToUlcer(room, ulcerId);
+}
+
+function jumpToKarte(room){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  
+  const tabBtn = document.querySelector('.tab-btn[data-tab="karte"]');
+  if(tabBtn) tabBtn.classList.add('active');
+  const tabContent = document.getElementById('tab-karte');
+  if(tabContent) tabContent.classList.add('active');
+  
+  const sel = document.getElementById('karte-room');
+  if(sel){
+    sel.value = room;
+    const event = new Event('change');
+    sel.dispatchEvent(event);
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function jumpToBraden(room){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  
+  const tabBtn = document.querySelector('.tab-btn[data-tab="braden"]');
+  if(tabBtn) tabBtn.classList.add('active');
+  const tabContent = document.getElementById('tab-braden');
+  if(tabContent) tabContent.classList.add('active');
+  
+  const sel = document.getElementById('braden-room');
+  if(sel){
+    sel.value = room;
+    document.getElementById('braden-to-karte-btn').style.display = room ? 'inline-block' : 'none';
+    const event = new Event('change');
+    sel.dispatchEvent(event);
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ========================================
+// PERSONAL KARTE
+// ========================================
+function renderKarte(room){
+  // Braden history
+  const bHist = bradenHistory.filter(h=>h.room===room).sort((a,b)=>a.date.localeCompare(b.date));
+  const latestB = bHist.length>0 ? bHist[bHist.length-1] : null;
+
+  // Summary
+  const sumEl = document.getElementById('karte-braden-summary');
+  if(latestB){
+    const risk = getRiskLevel(latestB.total);
+    sumEl.innerHTML = `<div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:32px;font-weight:800;color:${risk.color}">${latestB.total}点</span>
+      <span style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${risk.color};color:#fff">${risk.emoji} ${risk.label}</span>
+      <span style="font-size:12px;color:var(--text3)">最終評価: ${latestB.date}</span>
+    </div>`;
+  } else {
+    sumEl.innerHTML = '<p style="color:var(--text3)">ブレーデンスケールの評価記録がありません</p>';
+  }
+
+  // Chart
+  if(bHist.length>0){
+    drawLineChart('karte-braden-chart', bHist.map(h=>h.date), bHist.map(h=>h.total), 'ブレーデン合計点', 'var(--accent)');
+  }
+
+  // Table
+  const tbody = document.getElementById('karte-braden-tbody');
+  tbody.innerHTML = bHist.slice().reverse().map(h=>{
+    const risk = getRiskLevel(h.total);
+    return `<tr><td>${h.date}</td>${bradenSchema.map(s=>`<td>${h[s.id]||'—'}</td>`).join('')}<td style="font-weight:700;color:${risk.color}">${h.total}</td><td>${risk.label}</td><td>${h.staff||''}</td></tr>`;
+  }).join('');
+
+  // Care recs for latest
+  const careEl = document.getElementById('karte-care');
+  if(latestB){
+    let cHtml = '';
+    bradenSchema.forEach(item=>{
+      const v = latestB[item.id];
+      const rec = careRecommendations[item.id];
+      if(rec && v!==undefined && v <= rec.threshold){
+        rec.items.forEach(r=>{
+          cHtml += `<div class="care-card"><div class="care-card-title">⚠️ ${item.label}（${v}点）→ ${r.title}</div><div class="care-card-body">${r.body}</div></div>`;
+        });
+      }
+    });
+    careEl.innerHTML = cHtml || '<p style="color:var(--green);font-size:13px">現在、特別な介入が推奨される低スコア項目はありません。</p>';
+  } else {
+    careEl.innerHTML = '<p style="color:var(--text3);font-size:13px">評価データがないため推奨ケアを表示できません。</p>';
+  }
+
+  // Ulcer history
+  const drHist = designrHistory.filter(h=>h.room===room);
+  const ulcerIds = [...new Set(drHist.map(h=>h.ulcerId))];
+  const ulcerEl = document.getElementById('karte-ulcer-history');
+  if(ulcerIds.length===0){
+    ulcerEl.innerHTML = '<p style="color:var(--green);font-size:13px">✅ 褥瘡の発生記録はありません。</p>';
+  } else {
+    let uHtml = '';
+    ulcerIds.forEach(uid=>{
+      const records = drHist.filter(h=>h.ulcerId===uid).sort((a,b)=>a.date.localeCompare(b.date));
+      const first = records[0], last = records[records.length-1];
+      const statusChip = last.status==='治癒済み' ? '<span class="ulcer-chip healed">✅ 治癒済み</span>' : '<span class="ulcer-chip active-ulcer">⚠️ 経過観察中</span>';
+      uHtml += `<div style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;cursor:pointer;transition:background .2s" onclick="jumpToUlcerFromDashboard('${room}','${uid}')" class="karte-ulcer-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-weight:700">${first.site||'部位不明'}</span>${statusChip}
+        </div>
+        <div style="font-size:12px;color:var(--text2)">発生日: ${first.date} / 記録回数: ${records.length}回 / 最終スコア: ${last.total}点 <span style="color:var(--accent);font-weight:600;margin-left:8px">▶ DESIGN-R詳細を表示</span></div>
+      </div>`;
+    });
+    ulcerEl.innerHTML = uHtml;
+  }
+}
+
+// ========================================
+// CHART UTILITY (Canvas)
+// ========================================
+function drawLineChart(canvasId, labels, data, title, color){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width, h = rect.height;
+  const pad = {top:30, right:20, bottom:50, left:50};
+  const cw = w - pad.left - pad.right, ch = h - pad.top - pad.bottom;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if(data.length === 0) {
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text3').trim() || '#6b7280';
+    ctx.font = '13px "Noto Sans JP"';
+    ctx.textAlign = 'center';
+    ctx.fillText('データがありません', w/2, h/2);
+    return;
+  }
+
+  const maxVal = Math.max(...data, 23);
+  const minVal = Math.min(...data, 0);
+  const range = maxVal - minVal || 1;
+
+  // Grid & labels
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text3').trim() || '#6b7280';
+  const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(255,255,255,0.08)';
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  ctx.font = '11px "Outfit"';
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'right';
+
+  for(let i=0;i<=4;i++){
+    const val = Math.round(minVal + (range * i / 4));
+    const y = pad.top + ch - (ch * i / 4);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+    ctx.fillText(val, pad.left - 8, y + 4);
+  }
+
+  // X labels
+  ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor(labels.length / 6));
+  labels.forEach((l, i) => {
+    if(i % step === 0 || i === labels.length - 1){
+      const x = pad.left + (cw * i / Math.max(data.length - 1, 1));
+      ctx.save();
+      ctx.translate(x, h - pad.bottom + 16);
+      ctx.rotate(-0.4);
+      ctx.fillText(l, 0, 0);
+      ctx.restore();
+    }
+  });
+
+  // Line
+  const resolvedColor = getComputedStyle(document.documentElement).getPropertyValue(color.replace('var(','').replace(')','').trim()).trim() || color;
+  ctx.strokeStyle = resolvedColor;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = pad.left + (cw * i / Math.max(data.length - 1, 1));
+    const y = pad.top + ch - ((v - minVal) / range * ch);
+    if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  data.forEach((v, i) => {
+    const x = pad.left + (cw * i / Math.max(data.length - 1, 1));
+    const y = pad.top + ch - ((v - minVal) / range * ch);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = resolvedColor;
+    ctx.fill();
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel-solid').trim() || '#111827';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Value label
+    ctx.fillStyle = textColor;
+    ctx.font = '11px "Outfit"';
+    ctx.textAlign = 'center';
+    ctx.fillText(v, x, y - 10);
+  });
+
+  // Title
+  ctx.fillStyle = textColor;
+  ctx.font = '12px "Noto Sans JP"';
+  ctx.textAlign = 'left';
+  ctx.fillText(title, pad.left, 16);
+}
+
+// ========================================
+// ROSTER EDITOR
+// ========================================
+function renderRosterEditor(){
+  const ed = document.getElementById('roster-editor');
+  const arc = document.getElementById('roster-out-archive');
+  if(!ed || !arc) return;
+  
+  const roomKeys = new Set([
+    ...Object.keys(DEFAULT_RESIDENTS),
+    ...Object.keys(residents).filter(k => !k.startsWith('OUT_'))
+  ]);
+  
+  const activeRooms = Array.from(roomKeys).sort((a,b) => {
+    return (parseInt(a, 10) || 9999) - (parseInt(b, 10) || 9999);
+  });
+  const archiveList = [];
+  
+  Object.entries(residents).forEach(([room, name])=>{
+    if(room.startsWith('OUT_')){
+      archiveList.push({ key: room, name });
+    }
+  });
+  
+  ed.innerHTML = activeRooms.map(roomNum => {
+    const nameVal = residents[roomNum] || '';
+    return rosterRowHTML(roomNum, nameVal);
+  }).join('');
+  
+  ed.querySelectorAll('.roster-row').forEach(row=>{
+    attachRosterOutEvent(row);
+  });
+  
+  if(archiveList.length === 0){
+    arc.innerHTML = '<div style="color:var(--text3);text-align:center;padding:12px">退所した利用者の記録はありません</div>';
+  } else {
+    const archiveSorted = archiveList.sort((a, b) => {
+      const roomA = a.key.split('_')[1] || '';
+      const roomB = b.key.split('_')[1] || '';
+      const numA = parseInt(roomA, 10) || 9999;
+      const numB = parseInt(roomB, 10) || 9999;
+      if (numA !== numB) return numA - numB;
+      return a.key.localeCompare(b.key);
+    });
+    arc.innerHTML = archiveSorted.map(item=>{
+      const parts = item.key.split('_');
+      const origRoom = parts[1] || '';
+      return `<div class="roster-archive-row" data-key="${item.key}" data-name="${item.name}" data-room="${origRoom}" style="display:flex;justify-content:space-between;align-items:center;padding:6px;border-bottom:1px solid var(--border);border-radius:4px;margin-bottom:4px;background:rgba(255,255,255,0.02)">
+        <span>🚪 元${origRoom}号室 — <strong>${item.name}</strong> 様</span>
+        <button class="btn btn-sec btn-sm roster-in-btn" style="padding:2px 8px;font-size:11px;border-color:var(--green);color:var(--green);cursor:pointer;white-space:nowrap">元に戻す</button>
+      </div>`;
+    }).join('');
+    
+    arc.querySelectorAll('.roster-archive-row').forEach(row=>{
+      attachRosterInEvent(row);
+    });
+  }
+}
+
+function rosterRowHTML(room, name){
+  return `<div class="roster-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+    <input type="text" value="${room}" placeholder="部屋" style="width:70px;text-align:center" class="roster-room-input">
+    <input type="text" value="${name}" placeholder="氏名" style="flex-grow:1" class="roster-name-input">
+    <button class="btn btn-sec btn-sm roster-out-btn" style="padding:4px 10px;font-size:11px;border-color:var(--orange);color:var(--orange);cursor:pointer;white-space:nowrap">退所処理</button>
+  </div>`;
+}
+
+function attachRosterOutEvent(row){
+  const btn = row.querySelector('.roster-out-btn');
+  if(!btn) return;
+  btn.onclick = async()=>{
+    const roomInput = row.querySelector('.roster-room-input').value.trim();
+    const nameInput = row.querySelector('.roster-name-input').value.trim();
+    if(!roomInput || !nameInput){alert('部屋番号と氏名を入力した状態で退所処理を行ってください');return}
+    if(!confirm(`${roomInput}号室 ${nameInput} 様を退所処理しますか？\n(過去の評価履歴はアーカイブへ退避され保存されます)`)) return;
+    
+    const outKey = `OUT_${roomInput}_${nameInput}`;
+    
+    residents[outKey] = nameInput;
+    delete residents[roomInput];
+    
+    bradenHistory.forEach(h=>{
+      if(h.room === roomInput && (h.name === nameInput || !h.name)) {
+        h.room = outKey;
+        h.name = nameInput;
+      }
+    });
+    designrHistory.forEach(h=>{
+      if(h.room === roomInput && (h.name === nameInput || !h.name)) {
+        h.room = outKey;
+        h.name = nameInput;
+      }
+    });
+    
+    saveLocal();
+    populateRoomSelects();
+    renderDashboard();
+    renderRanking();
+    renderActiveUlcerPanel();
+    
+    row.querySelector('.roster-name-input').value = '';
+    renderRosterEditor();
+    
+    showToast('⌛ 保存中...');
+    try {
+      await gasPost({action:'updateRoster', roster: residents});
+      await gasPost({action:'updateAllHistories', bradenHistory, designrHistory});
+      showToast(`✅ ${nameInput} 様の退所処理が完了しました`);
+    } catch(err) {
+      console.error(err);
+      showToast('💾 ローカルに退所データを保存しました（GAS未接続）');
+    }
+  };
+}
+
+function attachRosterInEvent(row){
+  const btn = row.querySelector('.roster-in-btn');
+  if(!btn) return;
+  btn.onclick = async()=>{
+    const outKey = row.dataset.key;
+    const nameVal = row.dataset.name;
+    const origRoom = row.dataset.room;
+    
+    if(residents[origRoom]) {
+      alert(`⚠️ ${origRoom}号室にはすでに「${residents[origRoom]} 様」が入居されています。\n元に戻す前に、現在の入居者を移動させるか、退所処理を行ってください。`);
+      return;
+    }
+    
+    if(!confirm(`${nameVal} 様を ${origRoom}号室の入居中に戻しますか？\n(アーカイブから現入居者リストへ戻り、過去履歴も再紐付けされます)`)) return;
+    
+    residents[origRoom] = nameVal;
+    delete residents[outKey];
+    
+    bradenHistory.forEach(h=>{
+      if(h.room === outKey) {
+        h.room = origRoom;
+      }
+    });
+    designrHistory.forEach(h=>{
+      if(h.room === outKey) {
+        h.room = origRoom;
+      }
+    });
+    
+    saveLocal();
+    populateRoomSelects();
+    renderDashboard();
+    renderRanking();
+    renderActiveUlcerPanel();
+    renderRosterEditor();
+    
+    showToast('⌛ 保存中...');
+    try {
+      await gasPost({action:'updateRoster', roster: residents});
+      await gasPost({action:'updateAllHistories', bradenHistory, designrHistory});
+      showToast(`✅ ${nameVal} 様を入所中に戻しました`);
+    } catch(err) {
+      console.error(err);
+      showToast('💾 ローカルに入所データを保存しました（GAS未接続）');
+    }
+  };
+}
+
+// ========================================
+// GAS CODE
+// ========================================
+function renderGASCode(){
+  document.getElementById('gas-code-display').textContent = `// ==============================
+// 褥瘡無くそうアプリ - GAS コード
+// このコードをスプレッドシートの
+// 「拡張機能 → Apps Script」に貼り付け、
+// 「デプロイ → ウェブアプリ」で公開してください。
+// アクセスできるユーザー: 全員
+// ==============================
+
+const SS = SpreadsheetApp.getActiveSpreadsheet();
+
+function doGet(e) {
+  const action = e.parameter.action;
+  if (action === 'getInitData') {
+    return ContentService.createTextOutput(JSON.stringify(getInitData()))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput('OK');
+}
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ error: 'Lock acquisition timeout' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const action = data.action;
+
+    if (action === 'saveAssessment') {
+      saveAssessment(data.data);
+    } else if (action === 'saveDesignR') {
+      saveDesignR(data.data);
+    } else if (action === 'updateRoster') {
+      updateRoster(data.roster);
+    } else if (action === 'updateAllHistories') {
+      updateAllHistories(data.bradenHistory, data.designrHistory);
+    }
+  } catch (err) {
+    Logger.log('Error: ' + err);
+  } finally {
+    lock.releaseLock();
+  }
+  return ContentService.createTextOutput('OK');
+}
+
+function getOrCreateSheet(name, headers) {
+  let sheet = SS.getSheetByName(name);
+  if (!sheet) {
+    sheet = SS.insertSheet(name);
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setFontWeight('bold').setBackground('#4285f4').setFontColor('#ffffff');
+  }
+  return sheet;
+}
+
+function getInitData() {
+  // 名簿
+  const rosterSheet = getOrCreateSheet('名簿', ['部屋番号', '氏名', 'ステータス']);
+  const rosterData = rosterSheet.getDataRange().getValues();
+  const roster = {};
+  for (let i = 1; i < rosterData.length; i++) {
+    const room = String(rosterData[i][0] || '').trim();
+    const name = rosterData[i][1];
+    const status = rosterData[i][2];
+    if (room && name) {
+      if (status === '退所済み') {
+        roster['OUT_' + room + '_' + name] = name;
+      } else {
+        roster[room] = name;
+      }
+    }
+  }
+
+  // ブレーデン評価履歴
+  const bradenSheet = getOrCreateSheet('ブレーデン評価履歴',
+    ['評価日','部屋番号','評価スタッフ','知覚のズレ','湿潤','活動性','可動性','栄養状態','摩擦とズレ','合計点','リスクレベル','特記事項']);
+  const bradenData = bradenSheet.getDataRange().getValues();
+  const bradenHistory = [];
+  for (let i = 1; i < bradenData.length; i++) {
+    if (!bradenData[i][0]) continue;
+    bradenHistory.push({
+      date: Utilities.formatDate(new Date(bradenData[i][0]), 'Asia/Tokyo', 'yyyy-MM-dd'),
+      room: String(bradenData[i][1]),
+      staff: bradenData[i][2],
+      '知覚のズレ': bradenData[i][3], '湿潤': bradenData[i][4],
+      '活動性': bradenData[i][5], '可動性': bradenData[i][6],
+      '栄養状態': bradenData[i][7], '摩擦とズレ': bradenData[i][8],
+      total: bradenData[i][9], risk: bradenData[i][10],
+      note: bradenData[i][11]
+    });
+  }
+
+  // DESIGN-R記録
+  const drSheet = getOrCreateSheet('DESIGN-R記録',
+    ['記録日','部屋番号','褥瘡ID','発生部位','D','E','S','I','G','N','P','合計点','ステータス','備考']);
+  const drData = drSheet.getDataRange().getValues();
+  const designrHistory = [];
+  for (let i = 1; i < drData.length; i++) {
+    if (!drData[i][0]) continue;
+    designrHistory.push({
+      date: Utilities.formatDate(new Date(drData[i][0]), 'Asia/Tokyo', 'yyyy-MM-dd'),
+      room: String(drData[i][1]), ulcerId: drData[i][2], site: drData[i][3],
+      D: drData[i][4], E: drData[i][5], S: drData[i][6],
+      I: drData[i][7], G: drData[i][8], N: drData[i][9], P: drData[i][10],
+      total: drData[i][11], status: drData[i][12], note: drData[i][13]
+    });
+  }
+
+  return { roster, bradenHistory, designrHistory };
+}
+
+function saveAssessment(d) {
+  const sheet = getOrCreateSheet('ブレーデン評価履歴',
+    ['評価日','部屋番号','評価スタッフ','知覚のズレ','湿潤','活動性','可動性','栄養状態','摩擦とズレ','合計点','リスクレベル','特記事項']);
+  sheet.appendRow([
+    d.date, d.room, d.staff,
+    d['知覚のズレ'], d['湿潤'], d['活動性'], d['可動性'], d['栄養状態'], d['摩擦とズレ'],
+    d.total, d.risk, d.note
+  ]);
+}
+
+function saveDesignR(d) {
+  const sheet = getOrCreateSheet('DESIGN-R記録',
+    ['記録日','部屋番号','褥瘡ID','発生部位','D','E','S','I','G','N','P','合計点','ステータス','備考']);
+  sheet.appendRow([
+    d.date, d.room, d.ulcerId, d.site,
+    d.D, d.E, d.S, d.I, d.G, d.N, d.P,
+    d.total, d.status, d.note
+  ]);
+}
+
+function updateRoster(roster) {
+  const sheet = getOrCreateSheet('名簿', ['部屋番号', '氏名', 'ステータス']);
+  if (sheet.getLastRow() > 1) {
+    sheet.deleteRows(2, sheet.getLastRow() - 1);
+  }
+  const rooms = Object.keys(roster).sort(function(a, b) {
+    const roomA = a.indexOf('OUT_') === 0 ? a.split('_')[1] : a;
+    const roomB = b.indexOf('OUT_') === 0 ? b.split('_')[1] : b;
+    const numA = parseInt(roomA, 10) || 9999;
+    const numB = parseInt(roomB, 10) || 9999;
+    if (numA !== numB) return numA - numB;
+    return a.localeCompare(b);
+  });
+  rooms.forEach(room => {
+    const isOut = room.indexOf('OUT_') === 0;
+    const cleanRoom = isOut ? room.split('_')[1] : room;
+    const status = isOut ? '退所済み' : '入居中';
+    sheet.appendRow([cleanRoom, roster[room], status]);
+  });
+}
+
+function updateAllHistories(bradenHist, drHist) {
+  const bSheet = getOrCreateSheet('ブレーデン評価履歴',
+    ['評価日','部屋番号','評価スタッフ','知覚のズレ','湿潤','活動性','可動性','栄養状態','摩擦とズレ','合計点','リスクレベル','特記事項']);
+  if (bSheet.getLastRow() > 1) {
+    bSheet.deleteRows(2, bSheet.getLastRow() - 1);
+  }
+  if (bradenHist && bradenHist.length > 0) {
+    bradenHist.forEach(d => {
+      bSheet.appendRow([
+        d.date, d.room, d.staff||'',
+        d['知覚のズレ']||0, d['湿潤']||0, d['活動性']||0, d['可動性']||0, d['栄養状態']||0, d['摩擦とズレ']||0,
+        d.total||0, d.risk||'', d.note||''
+      ]);
+    });
+  }
+  
+  const drSheet = getOrCreateSheet('DESIGN-R記録',
+    ['記録日','部屋番号','褥瘡ID','発生部位','D','E','S','I','G','N','P','合計点','ステータス','備考']);
+  if (drSheet.getLastRow() > 1) {
+    drSheet.deleteRows(2, drSheet.getLastRow() - 1);
+  }
+  if (drHist && drHist.length > 0) {
+    drHist.forEach(d => {
+      drSheet.appendRow([
+        d.date, d.room, d.ulcerId||'', d.site||'',
+        d.D||0, d.E||0, d.S||0, d.I||0, d.G||0, d.N||0, d.P||0,
+        d.total||0, d.status||'', d.note||''
+      ]);
+    });
+  }
+}`;
+}
+
+// ========================================
+// PRINT REPORT
+// ========================================
+function handlePrintReport(){
+  // Build report in a new window
+  const latest = {};
+  bradenHistory.forEach(h=>{ if(!latest[h.room]||h.date>latest[h.room].date) latest[h.room]=h; });
+
+  const counts = {critical:0,high:0,moderate:0,mild:0,none:0,uneval:0};
+  const highRisk = [];
+  Object.keys(residents).forEach(room=>{
+    const e = latest[room];
+    if(!e){counts.uneval++;return}
+    if(e.total<=9){counts.critical++;highRisk.push(e)}
+    else if(e.total<=12){counts.high++;highRisk.push(e)}
+    else if(e.total<=14) counts.moderate++;
+    else if(e.total<=17) counts.mild++;
+    else counts.none++;
+  });
+
+  const activeUlcers = [];
+  const ulcerByKey = {};
+  designrHistory.filter(h=>h.status!=='治癒済み').forEach(h=>{
+    const k=`${h.room}-${h.ulcerId}`;
+    if(!ulcerByKey[k]||h.date>ulcerByKey[k].date) ulcerByKey[k]=h;
+  });
+  Object.values(ulcerByKey).forEach(u=>activeUlcers.push(u));
+
+  const today = new Date().toISOString().split('T')[0];
+  const html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+    <title>褥瘡対策委員会レポート ${today}</title>
+    <style>
+      body{font-family:'Noto Sans JP',sans-serif;padding:40px;color:#1f2937;font-size:13px;line-height:1.5}
+      h1{font-size:20px;text-align:center;margin-bottom:4px}
+      h2{font-size:15px;margin-top:24px;border-bottom:2px solid #3b82f6;padding-bottom:4px}
+      .date{text-align:center;color:#6b7280;margin-bottom:24px}
+      .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:16px 0}
+      .stat{text-align:center;padding:12px;border:1px solid #e5e7eb;border-radius:8px}
+      .stat .num{font-size:28px;font-weight:800}
+      .stat .label{font-size:11px;color:#6b7280}
+      table{width:100%;border-collapse:collapse;margin-top:8px}
+      th,td{border:1px solid #e5e7eb;padding:6px 10px;text-align:left;font-size:12px}
+      th{background:#f3f4f6;font-weight:600}
+      @media print{body{padding:20px}}
+    </style></head><body>
+    <h1>🛡️ 褥瘡対策委員会 レポート</h1>
+    <div class="date">${today}</div>
+    <h2>📊 リスク分布</h2>
+    <div class="stats">
+      <div class="stat"><div class="num" style="color:#ef4444">${counts.critical}</div><div class="label">極めて高度</div></div>
+      <div class="stat"><div class="num" style="color:#f59e0b">${counts.high}</div><div class="label">高度</div></div>
+      <div class="stat"><div class="num" style="color:#eab308">${counts.moderate}</div><div class="label">中等度</div></div>
+      <div class="stat"><div class="num" style="color:#3b82f6">${counts.mild}</div><div class="label">軽度</div></div>
+      <div class="stat"><div class="num" style="color:#10b981">${counts.none}</div><div class="label">リスクなし</div></div>
+      <div class="stat"><div class="num" style="color:#9ca3af">${counts.uneval}</div><div class="label">未評価</div></div>
+    </div>
+    <h2>⚠️ 高リスク者一覧（12点以下）</h2>
+    ${highRisk.length>0 ? `<table><thead><tr><th>部屋</th><th>氏名</th><th>合計点</th><th>リスク</th><th>評価日</th></tr></thead><tbody>
+      ${highRisk.sort((a,b)=>a.total-b.total).map(h=>`<tr><td>${h.room.replace(/\(.*?\-退所\)/g, '')}</td><td>${h.name || residents[h.room] || ''}</td><td><strong>${h.total}</strong></td><td>${getRiskLevel(h.total).label}</td><td>${h.date}</td></tr>`).join('')}
+    </tbody></table>` : '<p>該当なし</p>'}
+    <h2>🩹 現在褥瘡発生中</h2>
+    ${activeUlcers.length>0 ? `<table><thead><tr><th>部屋</th><th>氏名</th><th>部位</th><th>DESIGN-R</th><th>記録日</th></tr></thead><tbody>
+      ${activeUlcers.map(u=>`<tr><td>${u.room.replace(/\(.*?\-退所\)/g, '')}</td><td>${u.name || residents[u.room] || ''}</td><td>${u.site||''}</td><td>${u.total}点</td><td>${u.date}</td></tr>`).join('')}
+    </tbody></table>` : '<p>なし</p>'}
+    </body></html>`;
+
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(), 500);
+}
+
+// ========================================
+// TOAST
+// ========================================
+function showToast(msg, type){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = type==='error' ? 'rgba(239,68,68,.95)' : type==='warn' ? 'rgba(245,158,11,.95)' : 'rgba(16,185,129,.95)';
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 4000);
+}
+
+</script>
+</body>
+</html>
