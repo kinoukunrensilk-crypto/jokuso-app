@@ -519,6 +519,165 @@
         background: #eee !important;
       }
     }
+
+    /* === モバイル操作性向上レスポンシブスタイル (max-width: 768px) === */
+    @media (max-width: 768px) {
+      /* タッチの操作応答性向上 */
+      button, select, input, label, a {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* ヘッダーのスリム化 */
+      .header {
+        padding: 10px 14px;
+      }
+      .header h1 {
+        font-size: 16px;
+      }
+      .date-disp {
+        display: none; /* スマホ画面の領域確保 */
+      }
+      .hdr-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      /* タブナビゲーションの最適化 */
+      .tab-nav {
+        padding: 0 10px;
+        top: 47px;
+      }
+      .tab-btn {
+        padding: 12px 14px;
+        font-size: 12.5px;
+      }
+
+      /* コンテナとパネルのパディング調整 */
+      .main {
+        padding: 12px 10px;
+      }
+      .panel {
+        padding: 16px 12px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+      }
+      .panel-title {
+        font-size: 15px;
+      }
+
+      /* ブレーデンスケール・評価項目の縦積み & 大きなタップボタン */
+      .braden-row, .designr-item {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+        padding: 12px 0;
+      }
+      .braden-label, .designr-label {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+      .score-btns {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* 2列配置で押し間違い防止 */
+        gap: 8px !important;
+        width: 100%;
+      }
+      .score-btn label {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px !important; /* タップターゲット 44px 以上保証 */
+        padding: 8px 10px !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        text-align: center;
+        white-space: normal !important;
+        word-break: break-word;
+        border-radius: 10px !important;
+      }
+
+      /* セレクター行 (部屋番号・日付・氏名) の縦並び最適化 */
+      .selector-row, .selector-row.four-cols {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+        padding-bottom: 16px;
+      }
+      select, input[type="text"], input[type="number"], input[type="date"] {
+        min-height: 44px;
+        font-size: 15px; /* iOSでの拡大防止 */
+      }
+
+      /* スコア表示の調整 */
+      .score-display {
+        padding: 16px 12px;
+        margin: 14px 0;
+      }
+      .score-total {
+        font-size: 40px;
+      }
+
+      /* 2カラムレイアウト (ヘルプパネル含む) */
+      .two-col {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+      }
+      .sticky-col {
+        position: static !important;
+        max-height: none !important;
+      }
+
+      /* ポジショニングハンドブックのスマホ対応 */
+      .handbook-img-grid {
+        grid-template-columns: 1fr !important; /* 1カラム化で画像拡大 */
+        gap: 12px;
+      }
+      .handbook-img {
+        max-height: 280px !important;
+      }
+      .handbook-card {
+        padding: 16px 14px 16px 30px;
+        margin-bottom: 16px;
+      }
+      .handbook-card-title {
+        font-size: 17px;
+      }
+      .handbook-chk-item {
+        font-size: 13.5px;
+      }
+
+      /* ランキングリストのスマホ表示 */
+      .rank-row {
+        grid-template-columns: 32px 1fr 65px !important;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+
+      /* モーダルダイアログのスマホ化 */
+      .modal-box {
+        padding: 16px;
+        width: 98%;
+        max-height: 90vh;
+      }
+      .actions-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .actions-row .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 46px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .score-btns {
+        grid-template-columns: 1fr !important; /* 極小画面では1列 */
+      }
+      .header h1 {
+        font-size: 14.5px;
+      }
+    }
   </style>
 </head>
 <body>
