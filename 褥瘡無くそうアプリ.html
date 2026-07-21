@@ -1369,7 +1369,10 @@ function getRiskLevel(score){
 function getRiskColor(score){return getRiskLevel(score).color}
 
 // ---- GAS Communication ----
-function getGasUrl(){ return localStorage.getItem('jokuso_gas_url') || '' }
+// ---- GAS Communication ----
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxBKjIY3AZO-rF4Hlmg4pTEY94DbuCyPWK0rIsO7HJmY35RqOPhmE71D_T2YaMeFHiR/exec';
+
+function getGasUrl(){ return localStorage.getItem('jokuso_gas_url') || DEFAULT_GAS_URL; }
 
 async function gasGet(action){
   const url = getGasUrl();
@@ -1434,17 +1437,23 @@ async function loadFromGAS(){
   try{
     const data = await gasGet('getInitData');
     if(data){
-      const hasLocal = Object.keys(residents).length > 0;
-      if(!hasLocal && data.roster && Object.keys(data.roster).length>0){
+      const hasLocalRoster = Object.keys(residents).length > 0;
+      if(!hasLocalRoster && data.roster && Object.keys(data.roster).length>0){
         residents = data.roster;
       }
-      // GAS側にデータが1件以上ある場合のみローカルデータを上書きする
+      
       const hasGasData = (data.bradenHistory && data.bradenHistory.length > 0) || 
                          (data.designrHistory && data.designrHistory.length > 0);
+      const hasLocalData = bradenHistory.length > 0 || designrHistory.length > 0;
+
       if(hasGasData){
         bradenHistory = data.bradenHistory || [];
         designrHistory = data.designrHistory || [];
+        if(data.roster && Object.keys(data.roster).length>0) residents = data.roster;
         saveLocal();
+      } else if(hasLocalData){
+        // ローカルに保存済みデータがあれば全自動でGAS（スプレッドシート）へ初回同期アップロード
+        gasPost({action:'updateAllHistories', bradenHistory, designrHistory});
       }
     }
   }catch(e){console.error(e)}
