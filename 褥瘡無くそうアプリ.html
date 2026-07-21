@@ -399,6 +399,61 @@
       padding-top: 6px;
     }
     
+    /* ハンドブック画像 & チェックリストスタイル */
+    .handbook-img-wrap {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .handbook-img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      box-shadow: var(--shadow-sm);
+      display: block;
+    }
+    .handbook-img-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .handbook-checklist {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .handbook-chk-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .handbook-chk-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .handbook-chk-item:last-child {
+      margin-bottom: 0;
+    }
+    .handbook-chk-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    
     /* 印刷時の用紙レイアウト設定 */
     @media print {
       body.print-handbook-active {
@@ -432,12 +487,21 @@
         box-shadow: none !important;
         page-break-after: always;
         break-after: page;
-        margin: 0 auto 30mm auto !important; /* カットしやすいよう余白を開ける */
-        width: 148mm !important; /* A5横 / ハガキサイズ程度 */
-        height: 100mm !important;
-        padding: 20px 20px 20px 36px !important;
+        margin: 0 auto 20mm auto !important; /* カットしやすい余白 */
+        width: 170mm !important;
+        min-height: 115mm !important;
+        height: auto !important;
+        padding: 16px 16px 16px 36px !important;
         box-sizing: border-box !important;
         border-radius: 12px !important;
+      }
+      body.print-handbook-active .handbook-img {
+        max-height: 160px !important;
+        border: 1px solid #999 !important;
+      }
+      body.print-handbook-active .handbook-checklist {
+        background: #f9f9f9 !important;
+        border: 1px solid #ccc !important;
       }
       body.print-handbook-active .handbook-ring-hole {
         background: #fff !important;
@@ -445,6 +509,7 @@
       }
       body.print-handbook-active .handbook-card-title,
       body.print-handbook-active .handbook-body,
+      body.print-handbook-active .handbook-chk-item,
       body.print-handbook-active .handbook-body strong {
         color: #000 !important;
       }
@@ -725,9 +790,9 @@
     <div class="tab-content" id="tab-handbook">
       <div class="panel handbook-print-exclude" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div>
-          <h2 style="font-size:18px;font-weight:700">📖 ポジショニングハンドブック（印刷・ラミネート用）</h2>
+          <h2 style="font-size:18px;font-weight:700">📖 ポジショニングハンドブック（イラスト・チェックリスト付）</h2>
           <p style="font-size:13px;color:var(--text2);margin-top:4px">
-            現場での使い勝手を考慮した、文字が大きくキャッチーなカード型マニュアルです。印刷してラミネートし、リングで綴じてご使用ください。
+            現場での使い勝手を考慮した高視認性カード型マニュアルです。仰臥位・半側臥位のチェックリストと実用イラストを掲載しています。印刷してラミネート加工しご活用ください。
           </p>
         </div>
         <button class="btn btn-primary" id="btn-print-handbook" style="display:inline-flex;align-items:center;gap:8px">
@@ -736,242 +801,142 @@
       </div>
 
       <div class="handbook-grid">
-        <!-- CARD 1: 首のポジショニング -->
+        <!-- CARD 1: 仰臥位（あおむけ）チェックリスト -->
         <div class="handbook-card" style="border-left: 6px solid var(--accent)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--accent)">① 首</span>
-              <h3 class="handbook-card-title">首のポジショニング（拘縮対策）</h3>
+              <span class="handbook-badge" style="background:var(--accent)">① 仰臥位</span>
+              <h3 class="handbook-card-title">仰臥位（あおむけ）チェックリスト</h3>
             </div>
             
-            <!-- SVG Illustration (NG vs OK) -->
-            <svg viewBox="0 0 280 105" width="100%" height="105" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <!-- Left Side: NG -->
-              <g transform="translate(0, 0)">
-                <text x="65" y="15" font-size="9.5" fill="var(--red)" text-anchor="middle" font-weight="bold">😢 ダメポジショニング</text>
-                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
-                <!-- Thin pillow / Flat -->
-                <path d="M 85 90 C 85 85, 110 85, 110 90" fill="var(--red-g)" stroke="var(--red)" stroke-width="1"/>
-                <circle cx="80" cy="55" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/> <!-- Head -->
-                <path d="M 72 58 Q 50 62 40 85" fill="none" stroke="var(--text)" stroke-width="1.8"/> <!-- Body -->
-                <!-- Gap pointer -->
-                <path d="M 68 68 Q 63 68 62 60" fill="none" stroke="var(--red)" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <text x="65" y="77" font-size="7" fill="var(--red)" text-anchor="middle" font-weight="bold">首の後ろに隙間あり！</text>
-                <text x="65" y="85" font-size="6.5" fill="var(--red)" text-anchor="middle">後頭部に圧が過度にかかる</text>
-              </g>
-              
-              <!-- Right Side: OK -->
-              <g transform="translate(145, 0)">
-                <text x="65" y="15" font-size="9.5" fill="var(--green)" text-anchor="middle" font-weight="bold">✨ 神ポジショニング</text>
-                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
-                <!-- Pillow supporting neck fully -->
-                <path d="M 60 90 Q 80 50 110 70 L 110 90 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1"/>
-                <circle cx="75" cy="55" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-                <path d="M 67 58 Q 48 62 38 85" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-                <text x="65" y="80" font-size="7.5" fill="var(--green)" text-anchor="middle" font-weight="bold">枕で首の後ろを密着！</text>
-              </g>
-            </svg>
-
-            <div class="handbook-body">
-              <ul>
-                <li><strong>後頭部への圧集中をふせぐ！</strong><br>首の後ろに支えがないと、後頭部に圧が過度にかかり筋肉が緊張します。</li>
-                <li><strong>枕をしっかり入れて隙間をなくす！</strong><br>首の下に隙間がないように枕をしっかり入れ込みましょう。</li>
-                <li>これだけで筋肉の余計な緊張がぬけ、<strong>拘縮が進むのを防げます！</strong></li>
-              </ul>
+            <!-- 2 Images Grid -->
+            <div class="handbook-img-grid">
+              <div>
+                <img src="褥瘡無くそうイラスト/体位変換イラスト｜無料イラスト・フリー素材なら「イラストAC」.png" alt="仰臥位ポジショニング全体図" class="handbook-img">
+                <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:4px;font-weight:700">【全体図】各関節の保護と面支持</div>
+              </div>
+              <div>
+                <img src="褥瘡無くそうイラスト/痛みは拘縮の原因にも結果にも？ どうしたら拘縮の進行を防げる？(2026年5月10日更新) - 皮膚科専門医が伝授！医療従事者のための高齢者皮膚トラブル対策講座.png" alt="膝下高さチェック基準" class="handbook-img">
+                <div style="font-size:11px;color:var(--accent);text-align:center;margin-top:4px;font-weight:700">【重要】手のひらサイズの膝下高さ</div>
+              </div>
             </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 部位別ポジショニング</div>
+
+            <div class="handbook-checklist">
+              <div class="handbook-chk-title">📋 指さし確認チェックリスト（仰臥位）</div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>首の後ろ・枕：</strong>首の下に隙間を作らず枕を密着させ、後頭部への過度な圧集中を防止しているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>両肩・上肢：</strong>肩の後ろの隙間をクッションで埋め、腕を支えて手指に小タオルを握らせているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>膝下の高さ（良肢位）：</strong>マットから膝下までの距離を「指を除いた手のひらの長さ」程度に保ち、股・膝関節の緊張を抜いているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>下肢全域の支持：</strong>太もも〜膝裏〜足首まで「面」で隙間なくクッションを沿わせているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>かかとの浮かし：</strong>足首付近をしっかり支え、かかとをマットレスから完全に浮かせて無荷重にしているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>背抜き・圧抜き：</strong>体位固定後、背中・お尻・足を手で軽く持ち上げ、皮膚・衣服の引きつれを除去したか</div>
+              </div>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 仰臥位ポジショニング・チェックリスト</div>
           </div>
         </div>
 
-        <!-- CARD 2: 肩のポジショニング -->
+        <!-- CARD 2: 半側臥位（30度横向き寝）チェックリスト -->
         <div class="handbook-card" style="border-left: 6px solid var(--purple)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--purple)">② 肩</span>
-              <h3 class="handbook-card-title">肩のポジショニング（上肢サポート）</h3>
+              <span class="handbook-badge" style="background:var(--purple)">② 半側臥位</span>
+              <h3 class="handbook-card-title">半側臥位（30度側臥位）チェックリスト</h3>
             </div>
 
-            <!-- SVG Illustration (NG vs OK) -->
-            <svg viewBox="0 0 280 105" width="100%" height="105" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <!-- Left Side: NG -->
-              <g transform="translate(0, 0)">
-                <text x="65" y="15" font-size="9.5" fill="var(--red)" text-anchor="middle" font-weight="bold">😢 ダメポジショニング</text>
-                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
-                <circle cx="80" cy="50" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-                <path d="M 72 53 Q 60 60 55 75 L 40 85" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-                <!-- Arm floating -->
-                <path d="M 68 62 Q 80 65 78 80" fill="none" stroke="var(--text)" stroke-width="1.5"/>
-                <circle cx="78" cy="82" r="3.5" fill="none" stroke="var(--text)" stroke-width="1.5"/>
-                <circle cx="60" cy="67" r="5.5" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="2,2"/>
-                <text x="65" y="80" font-size="7" fill="var(--red)" text-anchor="middle" font-weight="bold">肩の後ろに隙間あり！</text>
-                <text x="65" y="87" font-size="6.5" fill="var(--red)" text-anchor="middle">肩甲骨に圧がかかりやすい</text>
-              </g>
-              
-              <!-- Right Side: OK -->
-              <g transform="translate(145, 0)">
-                <text x="65" y="15" font-size="9.5" fill="var(--green)" text-anchor="middle" font-weight="bold">✨ 神ポジショニング</text>
-                <line x1="10" y1="90" x2="120" y2="90" stroke="var(--text3)" stroke-width="1.2" />
-                <!-- Cushions under shoulder & arm -->
-                <path d="M 40 85 Q 52 72 65 90 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1"/>
-                <path d="M 70 82 Q 85 73 98 88 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1"/>
-                <circle cx="75" cy="50" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-                <path d="M 67 53 Q 55 60 50 75 L 35 85" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-                <path d="M 63 62 Q 78 72 75 82" fill="none" stroke="var(--text)" stroke-width="1.5"/>
-                <circle cx="75" cy="84" r="3.5" fill="none" stroke="var(--text)" stroke-width="1.5"/>
-                <rect x="73" y="82" width="4" height="4" fill="var(--green)" rx="1"/> <!-- towel -->
-                <text x="65" y="97" font-size="7.5" fill="var(--green)" text-anchor="middle">クッションで肩〜腕を支える</text>
-              </g>
-            </svg>
-
-            <div class="handbook-body">
-              <ul>
-                <li><strong>肩の後ろの隙間をなくして安定！</strong><br>肩の後ろにすき間があると体が不安定になり、肩甲骨の突出部分に圧が集中します。</li>
-                <li><strong>肩甲骨・上腕・前腕の下に当てる！</strong><br>隙間を埋めるように段階的にクッションを差し込みます。最初に腕と肩を横に広げておくと入れやすいです。</li>
-                <li><strong>手指にはタオルを握らせる！</strong><br>指が握り込んで固まらないよう、開いてタオル等を入れましょう。</li>
-              </ul>
+            <!-- Image -->
+            <div class="handbook-img-wrap">
+              <img src="褥瘡無くそうイラスト/実はリスクだらけ…適切な寝姿勢＋ポジショニング＋ギャッチアップとは！？(2026年3月30日更新) - 皮膚科専門医が伝授！医療従事者のための高齢者皮膚トラブル対策講座.png" alt="30度側臥位ポジショニング" class="handbook-img" style="max-height:240px">
+              <div style="font-size:11px;color:var(--purple);text-align:center;margin-top:4px;font-weight:700">【全体図】背部30度支持と両足間のクッション保護</div>
             </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 部位別ポジショニング</div>
+
+            <div class="handbook-checklist">
+              <div class="handbook-chk-title" style="color:var(--purple)">📋 指さし確認チェックリスト（半側臥位）</div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>30度角度保持：</strong>背中に30度三角ウェッジクッションを当て、真横（90度）にならず腰骨（大転子）への直接の重圧を避けているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>両足間のクッション：</strong>両膝〜足首の間にロングクッションを挟み、膝・くるぶしの骨同士の接触や摩擦を防いでいるか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>上肢の安定：</strong>上側の腕をクッションに預け、下側の肩・腕の圧迫や関節の強度のねじれを防いでいるか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>頚部の保持：</strong>首が曲がりすぎない高さの枕を当て、気道と首の筋肉の緊張を和らげているか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>圧抜き手技：</strong>クッション配置後、背中とお尻の下に手を滑らせて皮膚の引っ張りを逃がしたか</div>
+              </div>
+              <div class="handbook-chk-item">
+                <span class="handbook-chk-icon">☑️</span>
+                <div><strong>3秒押し発赤確認：</strong>仙骨・大転子・踵の皮膚を3秒押し、赤みが消えない場合は初期褥瘡（ステージⅠ）として報告したか</div>
+              </div>
+            </div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 半側臥位ポジショニング・チェックリスト</div>
           </div>
         </div>
 
-        <!-- CARD 3: 下肢のポジショニング -->
-        <div class="handbook-card" style="border-left: 6px solid var(--green)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--green)">③ 足</span>
-              <h3 class="handbook-card-title">下肢全体のポジショニング（体圧分散）</h3>
-            </div>
-
-            <!-- SVG Illustration (Smooth whole leg support) -->
-            <svg viewBox="0 0 240 100" width="100%" height="100" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <line x1="10" y1="85" x2="230" y2="85" stroke="var(--text3)" stroke-width="1.5" />
-              <!-- Under leg cushions -->
-              <path d="M 50 85 Q 80 50 110 85 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
-              <path d="M 105 85 Q 140 60 170 85 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
-              <path d="M 165 85 Q 185 75 200 85 Z" fill="var(--green-g)" stroke="var(--green)" stroke-width="1.2"/>
-              <!-- Leg line -->
-              <path d="M 20 50 L 50 50 Q 80 43 100 52 Q 130 52 160 68 Q 185 68 205 78 L 220 78 L 225 65" fill="none" stroke="var(--text)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Heel marker -->
-              <circle cx="205" cy="78" r="2.5" fill="var(--green)"/>
-              <text x="205" y="60" font-size="8" fill="var(--green)" text-anchor="middle" font-weight="bold">かかとを浮かす</text>
-              <text x="115" y="25" font-size="9.5" fill="var(--green)" text-anchor="middle" font-weight="bold">⭕ 隙間なく下肢全体を支える</text>
-              <path d="M 115 30 L 115 50" stroke="var(--green)" stroke-width="1" stroke-dasharray="2,2"/>
-            </svg>
-
-            <div class="handbook-body">
-              <ul>
-                <li><strong>隙間なく「下肢全体」を支える！</strong><br>太もも、ひざの裏、ふくらはぎの下に沿うように隙間なくクッションを当てて、広い面積で体重を受け止めます。</li>
-                <li><strong>「お尻（仙骨）」の圧を全体に逃がす！</strong><br>なだらかに下肢全体を支えることで、お尻（仙骨）にかかる負担が大幅に減少します。</li>
-                <li><strong>「かかと」は完全に浮かす！</strong><br>かかとがベッド面に直接接触しないよう、足首付近までしっかり支えて浮かせましょう。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 下肢ポジショニング</div>
-          </div>
-        </div>
-
-        <!-- CARD 4: 側臥位（横向き寝） -->
-        <div class="handbook-card" style="border-left: 6px solid var(--purple)">
-          <div class="handbook-ring-hole"></div>
-          <div class="handbook-card-content">
-            <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--purple)">④ 横向き</span>
-              <h3 class="handbook-card-title">30度側臥位（横向き寝）</h3>
-            </div>
-
-            <!-- SVG Illustration (Realistic 30 deg wedge and knee pillow) -->
-            <svg viewBox="0 0 240 105" width="100%" height="105" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <line x1="10" y1="90" x2="230" y2="90" stroke="var(--text3)" stroke-width="1.5" />
-              <!-- Back wedge cushion (Blue) -->
-              <path d="M 40 90 L 85 90 L 85 55 Z" fill="var(--accent-g)" stroke="var(--accent)" stroke-width="1.5"/>
-              <!-- Leg pillow -->
-              <ellipse cx="145" cy="70" rx="25" ry="10" fill="var(--green-g)" stroke="var(--green)" stroke-width="1" transform="rotate(-15, 145, 70)"/>
-              <!-- Body lines -->
-              <circle cx="75" cy="40" r="8" fill="none" stroke="var(--text)" stroke-width="1.8"/> <!-- Head -->
-              <path d="M 75 48 C 90 48, 105 55, 115 70" fill="none" stroke="var(--text)" stroke-width="2"/> <!-- Back & Hip -->
-              <path d="M 115 70 Q 135 60 160 72 L 195 82" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/> <!-- Top leg -->
-              <path d="M 115 70 Q 130 80 155 88 L 190 90" fill="none" stroke="var(--text)" stroke-width="1.5" stroke-linecap="round"/> <!-- Bottom leg -->
-              <!-- 30 degree marker -->
-              <path d="M 85 90 A 25 25 0 0 0 105 70" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
-              <text x="100" y="85" font-size="9" fill="var(--accent)" font-weight="bold">30°</text>
-              <text x="170" y="25" font-size="8.5" fill="var(--green)" text-anchor="middle" font-weight="bold">足の間にクッションを挟む</text>
-              <text x="170" y="37" font-size="7.5" fill="var(--text2)" text-anchor="middle">（骨同士の接触・摩擦を防ぐ）</text>
-            </svg>
-
-            <div class="handbook-body">
-              <ul>
-                <li><strong>大転子（骨の出っ張り）を直接あてない！</strong><br>真横（90度）を向いて寝ると、腰の骨に体重がすべてかかり、短時間で褥瘡が発生します。</li>
-                <li><strong>背中に30度クッションを入れる！</strong><br>背中に三角クッションなどを当て、体を軽く（30度）傾けます。これで背中の広い面で体重を支えられます。</li>
-                <li><strong>ひざ・足首の間にクッションを挟む！</strong><br>両足が重なり合って骨同士が擦れ合うのを防ぐため、足の間にクッションを挿入します。</li>
-              </ul>
-            </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 30度側臥位</div>
-          </div>
-        </div>
-
-        <!-- CARD 5: 背抜き・圧抜き -->
+        <!-- CARD 3: 背抜き・圧抜きのやり方 -->
         <div class="handbook-card" style="border-left: 6px solid var(--orange)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--orange)">⑤ 圧抜き</span>
-              <h3 class="handbook-card-title">「背抜き・圧抜き」のやり方</h3>
+              <span class="handbook-badge" style="background:var(--orange)">③ 圧抜き</span>
+              <h3 class="handbook-card-title">「背抜き・圧抜き」の基本手技</h3>
             </div>
-
-            <!-- SVG Illustration -->
-            <svg viewBox="0 0 200 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <path d="M 20 25 C 60 25, 80 35, 130 35 L 180 35" fill="none" stroke="var(--text)" stroke-width="1.8"/>
-              <path d="M 60 45 Q 90 33 120 45 Z" fill="var(--orange-g)" stroke="var(--orange)" stroke-width="1.2"/>
-              <!-- Hand sliding -->
-              <path d="M 120 20 L 96 35 M 96 35 L 105 32 M 96 35 L 99 26" fill="none" stroke="var(--orange)" stroke-width="1.8"/>
-              <text x="80" y="16" font-size="8.5" fill="var(--orange)" text-anchor="middle" font-weight="bold">手をスッとすべり込ませる</text>
-              <text x="156" y="52" font-size="8" fill="var(--text3)" text-anchor="middle">衣服・皮膚の「つっぱり」を逃がす</text>
-            </svg>
 
             <div class="handbook-body">
-              <p style="margin-bottom:8px">クッションを入れた直後は、皮膚や衣服が引っ張られています。必ず以下の手技を行ってください！</p>
+              <p style="margin-bottom:12px;font-weight:700;color:var(--orange)">⚠️ 体位変換・ギャッチアップの直後は、皮膚や衣服が引っ張られています。必ず以下の手技を行ってください！</p>
               <ul>
-                <li><strong>背抜き</strong>：背中の下に両手を差し込み、シーツや衣服のつっぱりを逃がすように、さっと手を滑らせて抜きます。</li>
-                <li><strong>尻抜き</strong>：お尻の下にも同様に手を入れ、圧を逃がします。</li>
-                <li><strong>足抜き</strong>：かかと・ふくらはぎを一度持ち上げ、下ろします。</li>
+                <li><strong>背抜き：</strong>背中の下に両手を差し込み、シーツや衣服のつっぱりを逃がすように、さっと手を滑らせて抜きます。</li>
+                <li><strong>尻抜き：</strong>お尻の下にも同様に両手を差し入れ、皮膚にかかったずれ力を逃がします。</li>
+                <li><strong>足抜き：</strong>かかと・ふくらはぎを軽く一度持ち上げて下ろし、つっぱりをリセットします。</li>
               </ul>
             </div>
-            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 背抜き・圧抜き</div>
+            <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 背抜き・圧抜き手技</div>
           </div>
         </div>
 
-        <!-- CARD 6: 皮膚の観察 -->
+        <!-- CARD 4: 皮膚の観察と発赤判定 -->
         <div class="handbook-card" style="border-left: 6px solid var(--red)">
           <div class="handbook-ring-hole"></div>
           <div class="handbook-card-content">
             <div class="handbook-card-header">
-              <span class="handbook-badge" style="background:var(--red)">⑥ 観察</span>
-              <h3 class="handbook-card-title">赤み（発赤）の見分け方</h3>
+              <span class="handbook-badge" style="background:var(--red)">④ 観察</span>
+              <h3 class="handbook-card-title">赤み（発赤）の3秒押し判定フロー</h3>
             </div>
-
-            <!-- SVG Illustration -->
-            <svg viewBox="0 0 200 70" width="100%" height="70" style="background:var(--input-bg); border-radius:8px; margin-bottom:12px; display:block;">
-              <rect x="15" y="42" width="55" height="6" fill="var(--red-g)" stroke="var(--red)" stroke-width="0.8"/>
-              <circle cx="42" cy="38" r="7" fill="var(--red)" opacity="0.3"/>
-              <text x="42" y="18" font-size="8" fill="var(--text2)" text-anchor="middle">赤みを発見</text>
-              <path d="M 105 14 L 105 34 Q 105 38 109 38 L 115 38 L 115 14" fill="none" stroke="var(--text)" stroke-width="1.5"/>
-              <path d="M 110 38 L 110 44" stroke="var(--red)" stroke-width="1.8"/>
-              <text x="110" y="10" font-size="8.5" fill="var(--red)" text-anchor="middle" font-weight="bold">3秒間押す！</text>
-              <text x="162" y="24" font-size="8" fill="var(--red)" text-anchor="middle" font-weight="bold">指を離して赤いままなら</text>
-              <text x="162" y="36" font-size="9.5" fill="var(--red)" text-anchor="middle" font-weight="bold">🚨 初期褥瘡の疑い</text>
-              <text x="162" y="48" font-size="7.5" fill="var(--text3)" text-anchor="middle">すぐ看護師に報告！</text>
-            </svg>
 
             <div class="handbook-body">
               <ul>
-                <li><strong>赤いところを見つけたら「指で3秒押す」！</strong><br>骨が出ている場所（仙骨、かかとなど）はオムツ交換時に必ずチェック！</li>
-                <li><strong>【判定ルール】</strong><br>
-                  ・白く消える ➡ 大丈夫（一時的な赤みです）<br>
-                  ・<strong>赤いまま消えない ➡ 褥瘡の初期（ステージⅠ）！</strong>
+                <li><strong>赤みを見つけたら「人差し指で3秒間押す」！</strong><br>仙骨・大転子・かかとなど、骨が出ている部位はオムツ交換・体位変換時に必ず目視チェック！</li>
+                <li><strong>【判定判定ルール】</strong><br>
+                  ・白く消える ➡ 正常（一時的な圧迫による赤み）<br>
+                  ・<strong>赤いまま消えない ➡ 🚨 初期褥瘡の疑い（ステージⅠ）！</strong>
                 </li>
-                <li><strong>赤いままなら、すぐに看護師へ報告！</strong><br>そして本アプリの「DESIGN-R記録」に登録しましょう。</li>
+                <li><strong>赤いまま消えない場合は速やかに看護師へ報告！</strong><br>そして本アプリの「DESIGN-R記録」タブに褥瘡登録を行ってください。</li>
               </ul>
             </div>
             <div class="handbook-footer">褥瘡無くそうアプリ 🛡️ 皮膚観察の基本</div>
