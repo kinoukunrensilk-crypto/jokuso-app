@@ -1370,17 +1370,6 @@ try { residents = JSON.parse(localStorage.getItem('jokuso_residents') || 'null')
 try { bradenHistory = JSON.parse(localStorage.getItem('jokuso_braden') || '[]'); } catch(e) { console.warn('[LocalStorage] bradenHistory 読み込み失敗。空配列を使用します。', e); bradenHistory = []; }
 try { designrHistory = JSON.parse(localStorage.getItem('jokuso_designr') || '[]'); } catch(e) { console.warn('[LocalStorage] designrHistory 読み込み失敗。空配列を使用します。', e); designrHistory = []; }
 
-// ---- XSS対策: HTMLエスケープユーティリティ ----
-function escapeHTML(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function saveLocal(){
   try {
     localStorage.setItem('jokuso_residents', JSON.stringify(residents));
@@ -1388,7 +1377,7 @@ function saveLocal(){
     localStorage.setItem('jokuso_designr', JSON.stringify(designrHistory));
   } catch(e) {
     if(e.name === 'QuotaExceededError' || e.code === 22) {
-      alert('⚠️ 保存領域の上限に達しました。\n\n写真データが多くなり保存できなくなっています。\n古い履歴や写真データを削除するか、GASへのデータ連携をご確認ください。');
+      alert('⚠️ 保存領域の上限に達しました。\n\n写真データが多くなり保存できなくなっています。');
     } else {
       console.error('[saveLocal] 保存エラー:', e);
     }
@@ -1834,7 +1823,6 @@ function setupEventListeners(){
     if(v!=='new') {
       loadExistingUlcer(v);
     } else {
-      // 部位・処置・ドレッシングをリセット
       document.getElementById('dr-site').value = '';
       document.getElementById('dr-site-other').value = '';
       document.getElementById('dr-site-other').style.display = 'none';
@@ -1844,28 +1832,6 @@ function setupEventListeners(){
       document.getElementById('dr-dressing').value = '';
       document.getElementById('dr-dressing-other').value = '';
       document.getElementById('dr-dressing-other').style.display = 'none';
-      // DESIGN-Rラジオボタンを全リセット（デフォルト値0に戻す）
-      document.querySelectorAll('input[name^="dr-"]').forEach(radio => {
-        radio.checked = (radio.value === '0');
-      });
-      // 創傷サイズ入力をリセット
-      const slEl = document.getElementById('dr-s-l');
-      const swEl = document.getElementById('dr-s-w');
-      if(slEl) slEl.value = '0';
-      if(swEl) swEl.value = '0';
-      const sCalc = document.getElementById('dr-s-calc');
-      if(sCalc) { sCalc.textContent = '面積: 0 cm² → s0 (0点)'; sCalc.dataset.score = '0'; }
-      // 特記事項をリセット
-      const noteEl = document.getElementById('dr-note');
-      if(noteEl) noteEl.value = '';
-      // 写真データをリセット
-      clearDRPhoto();
-      // 重症度バッジをリセット
-      const sevEl = document.getElementById('dr-severity');
-      if(sevEl) sevEl.innerHTML = '';
-      // タイムラインをリセット
-      const tlEl = document.getElementById('dr-timeline');
-      if(tlEl) tlEl.innerHTML = '<p style="font-size:13px;color:var(--text3);padding:12px">褥瘡を選択すると経過タイムラインが表示されます。</p>';
     }
   });
 
@@ -1931,20 +1897,6 @@ function setupEventListeners(){
     Object.entries(residents).forEach(([k, v])=>{
       if(k.startsWith('OUT_')) newR[k] = v;
     });
-
-    // 重複チェック
-    const roomInputs = [];
-    rows.forEach(row=>{
-      const rInput = row.querySelector('.roster-room-input')?.value.trim();
-      const nInput = row.querySelector('.roster-name-input')?.value.trim();
-      if(rInput && nInput) roomInputs.push(rInput);
-    });
-    const duplicates = roomInputs.filter((r, i) => roomInputs.indexOf(r) !== i);
-    if(duplicates.length > 0){
-      alert(`⚠️ 以下の部屋番号が重複して入力されています。修正してから保存してください。\n\n重複: ${[...new Set(duplicates)].join(', ')} 号室`);
-      return;
-    }
-
     rows.forEach(row=>{
       const rInput = row.querySelector('.roster-room-input')?.value.trim();
       const nInput = row.querySelector('.roster-name-input')?.value.trim();
@@ -2171,7 +2123,7 @@ async function handleBradenSubmit(){
 
   try {
     const entry = {
-      date: document.getElementById('braden-date').value || new Date().toLocaleDateString('sv-SE'),
+      date: document.getElementById('braden-date').value || new Date().toISOString().split('T')[0],
       room,
       name: residents[room] || '',
       staff: document.getElementById('braden-staff').value.trim(),
@@ -2208,7 +2160,7 @@ function handleBradenCopy(){
   let text = `【ブレーデンスケール評価】\n部屋: ${room}号室 ${residents[room]}様\n`;
   const staff = document.getElementById('braden-staff').value.trim();
   if(staff) text += `評価者: ${staff}\n`;
-  text += `評価日: ${new Date().toLocaleDateString('sv-SE')}\n\n`;
+  text += `評価日: ${new Date().toISOString().split('T')[0]}\n\n`;
   bradenSchema.forEach(item=>{
     const v = parseInt(document.querySelector(`input[name="b-${item.id}"]:checked`)?.value || 0);
     total += v;
@@ -2223,7 +2175,7 @@ function handleBradenCopy(){
 function handleBradenReset(){
   document.getElementById('braden-room').value = '';
   document.getElementById('braden-name').textContent = '—';
-  document.getElementById('braden-date').value = new Date().toLocaleDateString('sv-SE');
+  document.getElementById('braden-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('braden-staff').value = '';
   document.getElementById('braden-note').value = '';
   bradenSchema.forEach(item=>{
@@ -2281,28 +2233,26 @@ function renderDashboard(){
     <div class="stat-card"><div class="stat-num" style="color:var(--text3)">${counts.uneval}</div><div class="stat-label"><span class="stat-dot" style="background:var(--text3)"></span>未評価</div></div>
   `;
 
-
-
   // Reminders
   let remHtml = '';
   if(reminders.red.length>0){
     remHtml += `<div style="margin-bottom:12px"><div style="font-weight:700;color:var(--red);font-size:13px;margin-bottom:6px">🔴 6ヶ月以上経過（${reminders.red.length}名）</div>`;
     reminders.red.sort((a,b)=>b.days-a.days).forEach(r=>{
-      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${escapeHTML(r.room)}')"><b>${escapeHTML(String(r.room))}号室 ${escapeHTML(residents[r.room])}</b> — ${r.days}日経過 <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
+      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${r.room}')">${r.room}号室 ${residents[r.room]} — ${r.days}日経過 <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
     });
     remHtml += '</div>';
   }
   if(reminders.yellow.length>0){
     remHtml += `<div style="margin-bottom:12px"><div style="font-weight:700;color:var(--yellow);font-size:13px;margin-bottom:6px">🟡 5ヶ月経過（${reminders.yellow.length}名）</div>`;
     reminders.yellow.forEach(r=>{
-      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${escapeHTML(r.room)}')"><b>${escapeHTML(String(r.room))}号室 ${escapeHTML(residents[r.room])}</b> — ${r.days}日経過 <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
+      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${r.room}')">${r.room}号室 ${residents[r.room]} — ${r.days}日経過 <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
     });
     remHtml += '</div>';
   }
   if(reminders.uneval.length>0){
     remHtml += `<div><div style="font-weight:700;color:var(--text3);font-size:13px;margin-bottom:6px">⚪ 未評価（${reminders.uneval.length}名）</div>`;
     reminders.uneval.slice(0,10).forEach(r=>{
-      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${escapeHTML(r)}')"><b>${escapeHTML(String(r))}号室 ${escapeHTML(residents[r])}</b> <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
+      remHtml += `<div style="font-size:13px;padding:6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .2s" class="dash-reminder-row" onclick="jumpToBraden('${r}')">${r}号室 ${residents[r]} <span style="color:var(--accent);font-size:11px;margin-left:8px">▶ 評価する</span></div>`;
     });
     if(reminders.uneval.length>10) remHtml += `<div style="font-size:12px;color:var(--text3);margin-top:4px;padding-left:6px">他${reminders.uneval.length-10}名...</div>`;
     remHtml += '</div>';
@@ -2333,8 +2283,8 @@ function renderDashboard(){
   if(activeEntries.length>0){
     ulcerHtml += `<div style="font-weight:700;color:var(--red);font-size:14px;margin-bottom:10px">⚠️ ${activeEntries.length}件の褥瘡が発生中</div>`;
     activeEntries.sort((a,b)=>b.total-a.total).forEach(u=>{
-      ulcerHtml += `<div style="font-size:13px;padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .2s;border-radius:6px" onclick="jumpToUlcerFromDashboard('${escapeHTML(u.room)}','${escapeHTML(u.ulcerId)}')" class="dash-ulcer-row">
-        <span>${escapeHTML(String(u.room))}号室 ${escapeHTML(residents[u.room]||'')} — ${escapeHTML(u.site||'部位不明')}</span>
+      ulcerHtml += `<div style="font-size:13px;padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .2s;border-radius:6px" onclick="jumpToUlcerFromDashboard('${u.room}','${u.ulcerId}')" class="dash-ulcer-row">
+        <span>${u.room}号室 ${residents[u.room]||''} — ${u.site||'部位不明'}</span>
         <span class="ulcer-chip active-ulcer">DESIGN-R: ${u.total}点</span>
       </div>`;
     });
@@ -2414,10 +2364,10 @@ function applyRankFilter(floor, entries){
       else if(diff>0) change = `<span style="color:var(--green)">↑${diff}</span>`;
       else change = `<span style="color:var(--text3)">→</span>`;
     }
-    html += `<div class="rank-row ${e.risk.cls}" onclick="jumpToKarte('${escapeHTML(e.room)}')">
+    html += `<div class="rank-row ${e.risk.cls}" onclick="jumpToKarte('${e.room}')">
       <div class="rank-num">${i+1}</div>
-      <div style="font-weight:600">${escapeHTML(String(e.room))}</div>
-      <div>${escapeHTML(e.name)}</div>
+      <div style="font-weight:600">${e.room}</div>
+      <div>${e.name}</div>
       <div style="font-weight:800;color:${e.risk.color}">${e.score}点</div>
       <div><span style="padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:${e.risk.color};color:#fff;white-space:nowrap;">${e.risk.emoji} ${e.risk.label}</span></div>
       <div>${change}</div>
@@ -2719,11 +2669,6 @@ function openPhotoLightbox(photoUrl, firstPhotoUrl, room, name, site) {
   title.textContent = `📷 ${room}号室 ${name} — ${site} 創部写真詳細`;
 
   let html = '';
-  const isDriveUrl = photoUrl && photoUrl.startsWith('http');
-  const driveBtnHtml = isDriveUrl
-    ? `<div style="margin-top:10px;text-align:center"><a href="${photoUrl}" target="_blank" rel="noopener" class="btn btn-sec btn-sm" style="display:inline-flex;align-items:center;gap:4px">🌐 Google Driveで高画質元画像を開く</a></div>`
-    : '';
-
   if (firstPhotoUrl && firstPhotoUrl !== photoUrl) {
     html = `
       <div style="font-size:13px;color:var(--text2);margin-bottom:8px">
@@ -2732,21 +2677,19 @@ function openPhotoLightbox(photoUrl, firstPhotoUrl, room, name, site) {
       <div class="lightbox-compare-grid">
         <div class="lightbox-img-wrap">
           <div style="font-weight:700;font-size:13px;color:var(--orange);margin-bottom:6px">【初発時 / 過去の写真】</div>
-          <img src="${firstPhotoUrl}" alt="初発写真" onerror="this.onerror=null;this.parentElement.innerHTML+='<p style=font-size:11px;color:var(--text3)>⚠️ 画像の読み込みに失敗しました。下のリンクから参照してください。</p>'">
+          <img src="${firstPhotoUrl}" alt="初発写真">
         </div>
         <div class="lightbox-img-wrap">
           <div style="font-weight:700;font-size:13px;color:var(--green);margin-bottom:6px">【最新の創部写真】</div>
-          <img src="${photoUrl}" alt="最新写真" onerror="this.onerror=null;this.parentElement.innerHTML+='<p style=font-size:11px;color:var(--text3)>⚠️ 画像の読み込みに失敗しました。</p>'">
+          <img src="${photoUrl}" alt="最新写真">
         </div>
       </div>
-      ${driveBtnHtml}
     `;
   } else {
     html = `
       <div class="lightbox-img-wrap" style="margin-top:10px">
-        <img src="${photoUrl}" alt="創部拡大写真" onerror="this.onerror=null;this.parentElement.innerHTML+='<p style=font-size:11px;color:var(--text3);padding:10px>⚠️ 画像の読み込みに失敗しました。</p>'">
+        <img src="${photoUrl}" alt="創部拡大写真">
       </div>
-      ${driveBtnHtml}
     `;
   }
 
@@ -2811,7 +2754,7 @@ async function handleDRSubmit(){
     // GAS送信
     const res = await gasPost({action:'saveDesignR', data:entry});
     
-    // GAS側でGoogle Driveへ保存されURLが帰ってきた場合、Base64をDrive URLに置換（localStorage容量消費を防止）
+    // GAS側でGoogle Driveへ保存されURLが返ってきた場合、Base64をDrive URLに置換（localStorage容量消費を防止）
     if(res && res.photoUrl){
       entry.photo = res.photoUrl;
     }
@@ -2899,8 +2842,8 @@ function renderDRChart(room, ulcerId){
       else statusBadge = '<span class="status-badge status-treating">🟠 治療中</span>';
 
       let treatmentLine = '';
-      if(r.treatment) treatmentLine += `<span class="tl-treatment">💊 ${escapeHTML(r.treatment)}</span> `;
-      if(r.dressing) treatmentLine += `<span class="tl-treatment">🩹 ${escapeHTML(r.dressing)}</span> `;
+      if(r.treatment) treatmentLine += `<span class="tl-treatment">💊 ${r.treatment}</span> `;
+      if(r.dressing) treatmentLine += `<span class="tl-treatment">🩹 ${r.dressing}</span> `;
 
       tlHtml += `<div class="tl-item ${isFirst?'tl-first':''} ${isHealed?'tl-healed':''}">
         <div class="tl-date">${r.date}${daysSinceStart>0 ? ` （${daysSinceStart}日目）` : ' （初日）'} ${statusBadge}</div>
@@ -2908,7 +2851,7 @@ function renderDRChart(room, ulcerId){
           DESIGN-R: ${r.total}点 ${trendText}
         </div>
         ${treatmentLine ? `<div style="margin-top:4px">${treatmentLine}</div>` : ''}
-        ${r.note ? `<div class="tl-note">📝 ${escapeHTML(r.note)}</div>` : ''}
+        ${r.note ? `<div class="tl-note">📝 ${r.note}</div>` : ''}
       </div>`;
     });
 
@@ -3108,7 +3051,7 @@ function renderUlcerMgmtTab() {
   let healedThisMonthCount = 0;
 
   const today = new Date();
-  const currentMonthStr = today.toLocaleDateString('sv-SE').substring(0, 7);
+  const currentMonthStr = today.toISOString().substring(0, 7);
 
   const items = groupKeys.map(key => {
     const records = ulcerGroups[key].sort((a, b) => a.date.localeCompare(b.date));
@@ -3148,209 +3091,114 @@ function renderUlcerMgmtTab() {
       treatment: latestRec.treatment || '未入力',
       dressing: latestRec.dressing || '未入力',
       latestNote: latestRec.note || '',
- function renderGASCode(){
-  document.getElementById('gas-code-display').textContent = `// ==============================
-// 褥瘡無くそうアプリ - GAS コード (Google Drive写真自動保存対応)
-// このコードをスプレッドシートの
-// 「拡張機能 → Apps Script」に貼り付け、
-// 「デプロイ → ウェブアプリ」で公開してください。
-// アクセスできるユーザー: 全員
-// ==============================
-
-const SS = SpreadsheetApp.getActiveSpreadsheet();
-
-function doGet(e) {
-  const action = e ? e.parameter.action : '';
-  if (action === 'getInitData') {
-    return ContentService.createTextOutput(JSON.stringify(getInitData()))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput('OK');
-}
-
-function doPost(e) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ error: 'Lock acquisition timeout' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  let responseData = { status: 'OK' };
-  try {
-    const data = JSON.parse(e.postData.contents);
-    const action = data.action;
-
-    if (action === 'saveAssessment') {
-      saveAssessment(data.data);
-    } else if (action === 'saveDesignR') {
-      responseData = saveDesignR(data.data);
-    } else if (action === 'updateRoster') {
-      updateRoster(data.roster);
-    } else if (action === 'updateAllHistories') {
-      updateAllHistories(data.bradenHistory, data.designrHistory);
-    }
-  } catch (err) {
-    Logger.log('Error: ' + err);
-    responseData = { status: 'ERROR', message: String(err) };
-  } finally {
-    lock.releaseLock();
-  }
-  return ContentService.createTextOutput(JSON.stringify(responseData))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function getOrCreateSheet(name, headers) {
-  let sheet = SS.getSheetByName(name);
-  if (!sheet) {
-    sheet = SS.insertSheet(name);
-    sheet.appendRow(headers);
-    sheet.getRange(1, 1, 1, headers.length)
-      .setFontWeight('bold').setBackground('#4285f4').setFontColor('#ffffff');
-  }
-  return sheet;
-}
-
-// Google Drive専用保存フォルダの取得
-function getPhotoFolder() {
-  const folderName = '褥瘡創部写真';
-  const folders = DriveApp.getFoldersByName(folderName);
-  let folder;
-  if (folders.hasNext()) {
-    folder = folders.next();
-  } else {
-    folder = DriveApp.createFolder(folderName);
-    folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  }
-  return folder;
-}
-
-// 写真をGoogle Driveへ保存し直リンクURLを返す
-function savePhotoToDrive(base64Data, room, ulcerId, date) {
-  if (!base64Data || !base64Data.startsWith('data:image')) return base64Data || '';
-  try {
-    const folder = getPhotoFolder();
-    const splitData = base64Data.split(',');
-    const contentType = splitData[0].split(':')[1].split(';')[0];
-    const bytes = Utilities.base64Decode(splitData[1]);
-    const fileName = room + '号室_' + ulcerId + '_' + date.replace(/-/g, '') + '.jpg';
-    const blob = Utilities.newBlob(bytes, contentType, fileName);
-    const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    // 高速表示用サムネイルURL
-    return 'https://drive.google.com/thumbnail?id=' + file.getId() + '&sz=w1000';
-  } catch (e) {
-    Logger.log('Photo save error: ' + e);
-    return '';
-  }
-}
-
-function getInitData() {
-  // 名簿
-  const rosterSheet = getOrCreateSheet('名簿', ['部屋番号', '氏名', 'ステータス']);
-  const rosterData = rosterSheet.getDataRange().getValues();
-  const roster = {};
-  for (let i = 1; i < rosterData.length; i++) {
-    const room = String(rosterData[i][0] || '').trim();
-    const name = rosterData[i][1];
-    const status = rosterData[i][2];
-    if (room && name) {
-      if (status === '退所済み') {
-        roster['OUT_' + room + '_' + name] = name;
-      } else {
-        roster[room] = name;
-      }
-    }
-  }
-
-  // ブレーデン評価履歴
-  const bradenSheet = getOrCreateSheet('ブレーデン評価履歴',
-    ['評価日','部屋番号','評価スタッフ','知覚のズレ','湿潤','活動性','可動性','栄養状態','摩擦とズレ','合計点','リスクレベル','特記事項']);
-  const bradenData = bradenSheet.getDataRange().getValues();
-  const bradenHistory = [];
-  for (let i = 1; i < bradenData.length; i++) {
-    if (!bradenData[i][0]) continue;
-    bradenHistory.push({
-      date: Utilities.formatDate(new Date(bradenData[i][0]), 'Asia/Tokyo', 'yyyy-MM-dd'),
-      room: String(bradenData[i][1]),
-      staff: bradenData[i][2],
-      '知覚のズレ': bradenData[i][3], '湿潤': bradenData[i][4],
-      '活動性': bradenData[i][5], '可動性': bradenData[i][6],
-      '栄養状態': bradenData[i][7], '摩擦とズレ': bradenData[i][8],
-      total: bradenData[i][9], risk: bradenData[i][10],
-      note: bradenData[i][11]
-    });
-  }
-
-  // DESIGN-R記録
-  const drSheet = getOrCreateSheet('DESIGN-R記録',
-    ['記録日','部屋番号','褥瘡ID','発生部位','D','E','S','I','G','N','P','合計点','ステータス','処置','ドレッシング','写真URL','備考']);
-  const drData = drSheet.getDataRange().getValues();
-  const designrHistory = [];
-  for (let i = 1; i < drData.length; i++) {
-    if (!drData[i][0]) continue;
-    designrHistory.push({
-      date: Utilities.formatDate(new Date(drData[i][0]), 'Asia/Tokyo', 'yyyy-MM-dd'),
-      room: String(drData[i][1]), ulcerId: String(drData[i][2]), site: drData[i][3],
-      D: drData[i][4], E: drData[i][5], S: drData[i][6],
-      I: drData[i][7], G: drData[i][8], N: drData[i][9], P: drData[i][10],
-      total: drData[i][11], status: drData[i][12],
-      treatment: drData[i][13] || '', dressing: drData[i][14] || '',
-      photo: drData[i][15] || '', note: drData[i][16] || ''
-    });
-  }
-
-  return { roster, bradenHistory, designrHistory };
-}
-
-function saveAssessment(d) {
-  const sheet = getOrCreateSheet('ブレーデン評価履歴',
-    ['評価日','部屋番号','評価スタッフ','知覚のズレ','湿潤','活動性','可動性','栄養状態','摩擦とズレ','合計点','リスクレベル','特記事項']);
-  sheet.appendRow([
-    d.date, d.room, d.staff,
-    d['知覚のズレ'], d['湿潤'], d['活動性'], d['可動性'], d['栄養状態'], d['摩擦とズレ'],
-    d.total, d.risk, d.note
-  ]);
-}
-
-function saveDesignR(d) {
-  let photoUrl = d.photo || '';
-  if (photoUrl && photoUrl.startsWith('data:image')) {
-    photoUrl = savePhotoToDrive(photoUrl, d.room, d.ulcerId, d.date);
-  }
-  const sheet = getOrCreateSheet('DESIGN-R記録',
-    ['記録日','部屋番号','褥瘡ID','発生部位','D','E','S','I','G','N','P','合計点','ステータス','処置','ドレッシング','写真URL','備考']);
-  sheet.appendRow([
-    d.date, d.room, d.ulcerId, d.site,
-    d.D, d.E, d.S, d.I, d.G, d.N, d.P,
-    d.total, d.status, d.treatment || '', d.dressing || '',
-    photoUrl, d.note || ''
-  ]);
-  return { status: 'OK', photoUrl: photoUrl };
-}
-
-function updateRoster(roster) {
-  const sheet = getOrCreateSheet('名簿', ['部屋番号', '氏名', 'ステータス']);
-  if (sheet.getLastRow() > 1) {
-    sheet.deleteRows(2, sheet.getLastRow() - 1);
-  }
-  const rooms = Object.keys(roster).sort(function(a, b) {
-    const roomA = a.indexOf('OUT_') === 0 ? a.split('_')[1] : a;
-    const roomB = b.indexOf('OUT_') === 0 ? b.split('_')[1] : b;
-    const numA = parseInt(roomA, 10) || 9999;
-    const numB = parseInt(roomB, 10) || 9999;
-    if (numA !== numB) return numA - numB;
-    return a.localeCompare(b);
+      photoUrl,
+      firstPhotoUrl,
+      recordsCount: records.length
+    };
   });
-  rooms.forEach(room => {
-    const isOut = room.indexOf('OUT_') === 0;
-    const cleanRoom = isOut ? room.split('_')[1] : room;
-    const status = isOut ? '退所済み' : '入居中';
-    sheet.appendRow([cleanRoom, roster[room], status]);
+
+  const activeEl = document.getElementById('umg-stat-active');
+  if (activeEl) activeEl.textContent = activeCount;
+  const avgDaysEl = document.getElementById('umg-stat-avg-days');
+  if (avgDaysEl) avgDaysEl.textContent = activeCount > 0 ? `${Math.round(totalDaysSum / activeCount)}日` : '0日';
+  const longTermEl = document.getElementById('umg-stat-long-term');
+  if (longTermEl) longTermEl.textContent = longTermCount;
+  const healedEl = document.getElementById('umg-stat-healed');
+  if (healedEl) healedEl.textContent = healedThisMonthCount;
+
+  const badgeEl = document.getElementById('ulcer-mgmt-badge');
+  if (badgeEl) {
+    badgeEl.textContent = activeCount;
+    badgeEl.style.display = activeCount > 0 ? 'inline-block' : 'none';
+  }
+
+  const statusFilter = document.querySelector('#umg-status-filter .filter-chip.active')?.dataset?.status || 'active';
+  const floorFilter = document.getElementById('umg-floor-select')?.value || 'all';
+  const sortOption = document.getElementById('umg-sort-select')?.value || 'days-desc';
+
+  let filtered = items.filter(item => {
+    if (statusFilter === 'active' && item.isHealed) return false;
+    if (statusFilter === 'healed' && !item.isHealed) return false;
+    if (floorFilter !== 'all' && item.room.charAt(0) !== floorFilter) return false;
+    return true;
   });
-}
-`; 📸 写真撮影・再評価
+
+  filtered.sort((a, b) => {
+    if (sortOption === 'days-desc') return b.days - a.days;
+    if (sortOption === 'score-desc') return b.latestScore - a.latestScore;
+    if (sortOption === 'date-desc') return b.firstDate.localeCompare(a.firstDate);
+    return 0;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    if (emptyMsg) emptyMsg.style.display = 'block';
+    return;
+  }
+  if (emptyMsg) emptyMsg.style.display = 'none';
+
+  let html = '';
+  filtered.forEach(item => {
+    let daysClass = 'green';
+    if (item.days >= 30) daysClass = 'red';
+    else if (item.days >= 15) daysClass = 'yellow';
+
+    let scoreDiffHtml = '';
+    if (item.recordsCount > 1 && !item.isHealed) {
+      const diff = item.latestScore - item.firstScore;
+      if (diff < 0) scoreDiffHtml = `<span style="color:var(--green);font-size:12px;font-weight:700"> (▼${Math.abs(diff)}点改善)</span>`;
+      else if (diff > 0) scoreDiffHtml = `<span style="color:var(--red);font-size:12px;font-weight:700"> (▲${diff}点悪化)</span>`;
+      else scoreDiffHtml = '<span style="color:var(--text3);font-size:12px"> (→変化なし)</span>';
+    }
+
+    const photoHtml = item.photoUrl
+      ? `<img src="${item.photoUrl}" class="ulcer-card-photo" onclick="openPhotoLightbox('${item.photoUrl}', '${item.firstPhotoUrl}', '${item.room}', '${item.name}', '${item.site}')" title="タップで拡大・経過比較">`
+      : `<div class="ulcer-card-nophoto" onclick="switchToDesignRExisting('${item.room}', '${item.ulcerId}')"><span>📷 写真なし</span><span style="font-size:9px;color:var(--accent);margin-top:4px">▶ 撮影する</span></div>`;
+
+    html += `
+      <div class="umg-card ${item.isHealed ? 'healed-item' : ''}">
+        ${photoHtml}
+        <div class="umg-card-main">
+          <div class="umg-card-top">
+            <div class="umg-patient-name">
+              ${item.room}号室 ${item.name}
+              <span class="umg-site-tag">${item.site}</span>
+            </div>
+            <div>
+              ${item.isHealed
+                ? '<span class="status-badge status-healed">✅ 治癒済み</span>'
+                : `<span class="days-badge ${daysClass}">⏱️ 発生${item.days}日目 (${item.firstDate}発生)</span>`
+              }
+            </div>
+          </div>
+
+          <div class="umg-details-grid">
+            <div>
+              <div style="font-weight:600;color:var(--text3);font-size:11px">DESIGN-R スコア</div>
+              <div style="font-size:15px;font-weight:800;color:${item.isHealed ? 'var(--green)' : 'var(--red)'}">
+                ${item.latestScore}点 ${scoreDiffHtml}
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:600;color:var(--text3);font-size:11px">現在の処置</div>
+              <div style="font-weight:600;color:var(--text)">${item.treatment}</div>
+            </div>
+            <div>
+              <div style="font-weight:600;color:var(--text3);font-size:11px">使用ドレッシング材</div>
+              <div style="font-weight:600;color:var(--text)">${item.dressing}</div>
+            </div>
+            <div>
+              <div style="font-weight:600;color:var(--text3);font-size:11px">最終評価日 / 回数</div>
+              <div style="font-weight:600;color:var(--text)">${item.latestDate} (${item.recordsCount}回目)</div>
+            </div>
+          </div>
+
+          ${item.latestNote ? `<div style="font-size:12px;color:var(--text2);background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:6px;margin-bottom:8px">💬 <strong>メモ:</strong> ${item.latestNote}</div>` : ''}
+
+          <div class="umg-action-btns">
+            ${!item.isHealed ? `
+              <button class="btn btn-primary btn-sm" onclick="switchToDesignRExisting('${item.room}', '${item.ulcerId}')">
+                📸 写真撮影・再評価
               </button>
               <button class="btn btn-sec btn-sm" onclick="quickDRHeal('${item.room}', '${item.ulcerId}')" style="border-color:var(--green);color:var(--green)">
                 ✅ 治癒完了にする
@@ -3395,7 +3243,7 @@ async function quickDRHeal(room, ulcerId) {
   if (!confirm(`【確認】 ${room}号室の褥瘡(${ulcerId})を「治癒済み」として記録しますか？`)) return;
   const records = designrHistory.filter(h => h.room === room && h.ulcerId === ulcerId);
   const latest = records.sort((a, b) => b.date.localeCompare(a.date))[0];
-  const today = new Date().toLocaleDateString('sv-SE');
+  const today = new Date().toISOString().split('T')[0];
 
   const entry = {
     date: today,
@@ -3974,7 +3822,7 @@ function handlePrintReport(){
   });
   Object.values(ulcerByKey).forEach(u=>activeUlcers.push(u));
 
-  const today = new Date().toLocaleDateString('sv-SE');
+  const today = new Date().toISOString().split('T')[0];
   const html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
     <title>褥瘡対策委員会レポート ${today}</title>
     <style>
