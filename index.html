@@ -1630,27 +1630,93 @@ async function loadFromGAS(){
   try{
     const data = await gasGet('getInitData');
     if(data){
-      const hasLocalRoster = Object.keys(residents).length > 0;
-      if(!hasLocalRoster && data.roster && Object.keys(data.roster).length>0){
-        residents = data.roster;
+      // 名簿のマージ
+      if(data.roster && Object.keys(data.roster).length > 0){
+        Object.entries(data.roster).forEach(([k, v]) => {
+          if (!residents[k]) residents[k] = v;
+        });
       }
-      
-      const hasGasData = (data.bradenHistory && data.bradenHistory.length > 0) || 
-                         (data.designrHistory && data.designrHistory.length > 0);
-      const hasLocalData = bradenHistory.length > 0 || designrHistory.length > 0;
 
-      if(hasGasData){
-        bradenHistory = data.bradenHistory || [];
-        designrHistory = data.designrHistory || [];
-        if(data.roster && Object.keys(data.roster).length>0) residents = data.roster;
-        saveLocal();
-      } else if(hasLocalData){
-        // ローカルに保存済みデータがあれば全自動でGAS（スプレッドシート）へ初回同期アップロード
-        gasPost({action:'updateAllHistories', bradenHistory, designrHistory});
+      // ブレーデン評価履歴の差分マージ（ローカル未送信データを保護）
+      if(data.bradenHistory && Array.isArray(data.bradenHistory)){
+        bradenHistory = mergeHistories(
+          bradenHistory,
+          data.bradenHistory,
+          h => `${h.room}_${h.date}_${h.staff || ''}`
+        );
       }
+
+      // DESIGN-R記録の差分マージ（ローカル未送信データを保護）
+      if(data.designrHistory && Array.isArray(data.designrHistory)){
+        designrHistory = mergeHistories(
+          designrHistory,
+          data.designrHistory,
+          h => `${h.room}_${h.ulcerId}_${h.date}_${h.status || ''}`
+        );
+      }
+
+      saveLocal();
+
+      // 未送信データの自動再送信（バックグラウンドリトライ）
+      await syncPendingRecords();
+
       renderUlcerMgmtTab();
     }
-  }catch(e){console.error(e)}
+  }catch(e){console.error('[loadFromGAS Error]', e)}
+}
+
+// 履歴差分マージヘルパー（ローカル未送信フラグ syncPending は保護）
+function mergeHistories(localArr, gasArr, keyGen) {
+  const map = new Map();
+
+  // まずGASデータを設定
+  gasArr.forEach(item => {
+    const key = keyGen(item);
+    map.set(key, item);
+  });
+
+  // ローカルデータをマージ（未送信フラグがあるもの、またはローカルにしか存在しないものをマージ）
+  localArr.forEach(item => {
+    const key = keyGen(item);
+    if (item.syncPending || !map.has(key)) {
+      map.set(key, item);
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+// 通信エラー等でローカルに滞留した未送信データの自動同期処理
+async function syncPendingRecords() {
+  const pendingBraden = bradenHistory.filter(h => h.syncPending);
+  const pendingDesignR = designrHistory.filter(h => h.syncPending);
+
+  if (pendingBraden.length === 0 && pendingDesignR.length === 0) return;
+
+  showToast(`📶 未送信のデータを再同期中... (${pendingBraden.length + pendingDesignR.length}件)`, 'info');
+
+  let syncedCount = 0;
+  for (const b of pendingBraden) {
+    const res = await gasPost({ action: 'saveAssessment', data: b });
+    if (res) {
+      delete b.syncPending;
+      syncedCount++;
+    }
+  }
+
+  for (const dr of pendingDesignR) {
+    const res = await gasPost({ action: 'saveDesignR', data: dr });
+    if (res) {
+      delete dr.syncPending;
+      if (res.photoUrl) dr.photo = res.photoUrl;
+      syncedCount++;
+    }
+  }
+
+  if (syncedCount > 0) {
+    saveLocal();
+    showToast(`✅ ${syncedCount}件の未送信データをスプレッドシートへ再同期しました`);
+  }
 }
 
 function populateRoomSelects(){
@@ -2138,11 +2204,14 @@ async function handleBradenSubmit(){
     entry.total = total;
     entry.risk = getRiskLevel(total).label;
 
+    const ok = await gasPost({action:'saveAssessment', data:entry});
+    if (!ok) {
+      entry.syncPending = true;
+    }
     bradenHistory.push(entry);
     saveLocal();
 
-    const ok = await gasPost({action:'saveAssessment', data:entry});
-    showToast(ok ? '✅ スプレッドシートに保存しました！' : '💾 ローカルに保存しました（GAS未接続）');
+    showToast(ok ? '✅ スプレッドシートに保存しました！' : '💾 オフライン保存しました。次回ネットワーク接続時に自動送信されます', ok ? 'info' : 'warn');
     handleBradenReset();
   } catch (err) {
     console.error(err);
@@ -2757,12 +2826,14 @@ async function handleDRSubmit(){
     // GAS側でGoogle Driveへ保存されURLが返ってきた場合、Base64をDrive URLに置換（localStorage容量消費を防止）
     if(res && res.photoUrl){
       entry.photo = res.photoUrl;
+    } else if (!res) {
+      entry.syncPending = true;
     }
 
     designrHistory.push(entry);
     saveLocal();
 
-    showToast(res ? '✅ DESIGN-R記録と創部写真をGoogle Driveに保存しました' : '💾 ローカルに保存しました（GAS未接続）');
+    showToast(res ? '✅ DESIGN-R記録と創部写真をGoogle Driveに保存しました' : '💾 オフライン保存しました。次回接続時に自動再送します', res ? 'info' : 'warn');
 
     clearDRPhoto();
     updateDRUlcerSelect(room);
@@ -2795,10 +2866,13 @@ async function handleDRHeal(){
     room, ulcerId, site,
     status:'治癒済み', note:'治癒済み', D:0,E:0,S:0,I:0,G:0,N:0,P:0, total:0
   };
+  const ok = await gasPost({action:'saveDesignR', data:entry});
+  if (!ok) {
+    entry.syncPending = true;
+  }
   designrHistory.push(entry);
   saveLocal();
-  await gasPost({action:'saveDesignR', data:entry});
-  showToast('✅ 治癒済みとして記録しました');
+  showToast(ok ? '✅ 治癒済みとして記録しました' : '💾 オフライン保存しました（次回自動送信）');
   updateDRUlcerSelect(room);
   renderDRChart(room, ulcerId);
   renderActiveUlcerPanel();
