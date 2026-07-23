@@ -20,11 +20,11 @@
       --c2: #3b82f6; --c3: #10b981; --c4: #f59e0b; --c5: #8b5cf6;
       --radius: 16px; --radius-sm: 10px;
     }
-    body.light { --bg: #f0f2f5; --bg2: #e5e7eb; --panel: rgba(255,255,255,0.88); --panel-solid: #fff;
-      --border: rgba(0,0,0,0.08); --text: #1f2937; --text2: #4b5563; --text3: #9ca3af;
-      --input-bg: rgba(0,0,0,0.03); --hover: rgba(0,0,0,0.02);
-      --accent-g: rgba(59,130,246,0.08); --red-g: rgba(239,68,68,0.08);
-      --orange-g: rgba(245,158,11,0.08); --yellow-g: rgba(234,179,8,0.08); --green-g: rgba(16,185,129,0.08);
+    body.light { --bg: #f1f5f9; --bg2: #e2e8f0; --panel: #ffffff; --panel-solid: #ffffff;
+      --border: rgba(0,0,0,0.12); --text: #0f172a; --text2: #334155; --text3: #64748b;
+      --input-bg: #f8fafc; --hover: rgba(0,0,0,0.04);
+      --accent-g: rgba(59,130,246,0.12); --red-g: rgba(239,68,68,0.12);
+      --orange-g: rgba(245,158,11,0.12); --yellow-g: rgba(234,179,8,0.12); --green-g: rgba(16,185,129,0.12);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Outfit','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);
@@ -678,6 +678,55 @@
         font-size: 14.5px;
       }
     }
+
+    /* === ULCER MONITORING HERO PANEL & CONTRAST FIXES === */
+    .umg-hero-panel {
+      background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(30,41,59,0.85) 100%);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #f8fafc;
+    }
+    .umg-hero-panel p {
+      color: #cbd5e1;
+    }
+    body.light .umg-hero-panel {
+      background: linear-gradient(135deg, #fff2f2 0%, #ffffff 100%);
+      border: 1px solid rgba(239,68,68,0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      color: #0f172a;
+    }
+    body.light .umg-hero-panel p {
+      color: #475569 !important;
+      font-weight: 600;
+    }
+    body.light .stat-card {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.12);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    body.light .stat-label {
+      color: #334155 !important;
+      font-weight: 700 !important;
+    }
+    body.light .umg-card {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.12);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    body.light .umg-patient-name {
+      color: #0f172a;
+    }
+    body.light .umg-details-grid {
+      background: #f8fafc;
+      border: 1px solid rgba(0,0,0,0.08);
+      color: #0f172a;
+    }
+    body.light .umg-details-grid div div:first-child {
+      color: #475569 !important;
+      font-weight: 700 !important;
+    }
+    body.light .umg-details-grid div div:last-child {
+      color: #0f172a;
+    }
   </style>
 </head>
 <body>
@@ -711,13 +760,13 @@
 
     <!-- ====== TAB 0: ULCER MANAGEMENT (MEDICAL STAFF VIEW) ====== -->
     <div class="tab-content active" id="tab-ulcer-mgmt">
-      <div class="panel" style="background:linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(17,24,39,0.8) 100%);border-color:rgba(239,68,68,0.3)">
+      <div class="panel umg-hero-panel">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
           <div>
-            <h2 style="font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px">
+            <h2 style="font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px">
               🩺 医務用 褥瘡発生者モニタリングボード
             </h2>
-            <p style="font-size:12.5px;color:var(--text2);margin-top:2px">
+            <p style="font-size:12.5px;margin-top:2px">
               誰が褥瘡か・いつから発生しているか・経過日数・創部写真・処置内容をリアルタイムで一元管理します。
             </p>
           </div>
